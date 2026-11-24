@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Екипно такмичење 2026</title>
+<style>
+  html, body { margin: 0; padding: 0; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; }
+  body { padding-bottom: 40px; background: transparent; }
+  .fishing-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; background: linear-gradient(160deg, #06283D 0%, #0E4D64 48%, #1B4332 100%); }
+  .hd, .nv, .bx { position: relative; z-index: 1; }
+  .hd { background: linear-gradient(90deg, rgba(6, 40, 61, 0.94), rgba(15, 23, 42, 0.94), rgba(27, 67, 50, 0.94)); color: #fff; padding: 12px 14px; display: flex; align-items: center; justify-content: center; gap: 12px; border-bottom: 2px solid rgba(56, 189, 248, 0.35); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+  .hd-logo { width: 46px; height: 46px; border-radius: 10px; background: #ffffff; padding: 2px; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,0.35); flex-shrink: 0; }
+  .hd-title { font-weight: 900; font-size: 16px; text-align: center; letter-spacing: 0.4px; text-shadow: 0 2px 4px rgba(0,0,0,0.4); word-break: break-word; }
+  .nv { display: flex; background: rgba(15, 23, 42, 0.95); position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .nv button { flex: 1; padding: 13px 2px; border: none; background: none; color: #cbd5e1; font-weight: 800; font-size: 12px; cursor: pointer; }
+  .nv button.act { background: linear-gradient(180deg, rgba(56, 189, 248, 0.25), rgba(16, 185, 129, 0.3)); color: #ffffff; border-bottom: 3px solid #38bdf8; }
+  .bx { padding: 14px 12px; max-width: 500px; margin: auto; }
+  .cd { background: rgba(255, 255, 255, 0.97); padding: 12px 14px; border-radius: 14px; margin-bottom: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.28); }
+  .podium-card { display: flex; justify-content: space-between; align-items: center; padding: 13px 14px; border-radius: 15px; margin-bottom: 10px; gap: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.28); }
+  .pod-1 { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 55%, #fde68a 100%); border: 2px solid #f59e0b; }
+  .pod-2 { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 55%, #cbd5e1 100%); border: 2px solid #94a3b8; }
+  .pod-3 { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 55%, #fed7aa 100%); border: 2px solid #d97706; }
+  .trophy-3d { width: 38px; height: 38px; flex-shrink: 0; }
+  .rw { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0; gap: 8px; flex-wrap: wrap; }
+  .rw:last-child { border: none; padding-bottom: 2px; }
+  .rw:first-child { padding-top: 2px; }
+  .bg { background: linear-gradient(135deg, #0f172a, #1e3a8a); color: #fff; border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+  .t-info { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; }
+  .t-logo { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid #cbd5e1; background: #ffffff; flex-shrink: 0; }
+  .t-name { font-weight: 800; font-size: 14.5px; color: #0f172a; }
+  .gr { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+  input[type="text"], input[type="number"], select { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 9px; box-sizing: border-box; background: #f8fafc; }
+  .bt { width: 100%; padding: 14px; background: linear-gradient(135deg, #1b4332, #2d6a4f); color: #fff; border: none; border-radius: 11px; font-size: 14px; font-weight: 800; margin-top: 8px; cursor: pointer; }
+  .bt-pdf { background: linear-gradient(135deg, #b91c1c, #dc2626); }
+  .bt-wa { background: linear-gradient(135deg, #0284c7, #0369a1); }
+  .bt-tbl { background: linear-gradient(135deg, #4338ca, #312e81); }
+  .bt-sm { border: none; padding: 8px 10px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 700; color: #fff; display: inline-flex; align-items: center; justify-content: center; text-align: center; }
+  .bt-logo { background: #0284c7; }
+  .bt-ed { background: #d97706; }
+  .bt-del { background: #dc2626; }
+  .hi { display: none !important; }
+  .file-mob { position: fixed; top: -100px; left: -100px; width: 1px; height: 1px; opacity: 0.01; }
+  #prevBox { margin-top: 14px; text-align: center; }
+  #prevImg { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; }
+  .sec-title { font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.4px; }
+  #printArea { display: none; }
+  @media print {
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+    #printArea img { width: 100%; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="fishing-bg">
+  <svg width="100%" height="100%" xmlns="http://w3.org">
+    <defs>
+      <pattern id="fishPattern" width="200" height="200" patternUnits="userSpaceOnUse">
+        <path d="M0 35 Q 50 18, 100 35 T 200 35" fill="none" stroke="#38bdf8" stroke-opacity="0.28" stroke-width="2.5"/>
+        <path d="M0 140 Q 50 123, 100 140 T 200 140" fill="none" stroke="#34d399" stroke-opacity="0.28" stroke-width="2.5"/>
+        <g transform="translate(22,55) rotate(-20)">
+          <path d="M0 16 C 16 0, 38 0, 52 16 C 38 32, 16 32, 0 16 Z" fill="#f59e0b" fill-opacity="0.42"/>
+          <polygon points="49,16 64,4 64,28" fill="#fb923c" fill-opacity="0.45"/>
+          <circle cx="13" cy="13" r="2.5" fill="#ffffff" fill-opacity="0.75"/>
+        </g>
+        <g transform="translate(145,25) rotate(18)">
+          <line x1="14" y1="0" x2="14" y2="52" stroke="#fde047" stroke-opacity="0.55" stroke-width="2.5"/>
+          <ellipse cx="14" cy="25" rx="7" ry="14" fill="#ef4444" fill-opacity="0.55"/>
+          <path d="M7 25 A 7 14 0 0 0 21 25 Z" fill="#ffffff" fill-opacity="0.55"/>
+        </g>
+        <g transform="translate(115,152) rotate(12)">
+          <path d="M0 13 C 14 0, 32 0, 44 13 C 32 26, 14 26, 0 13 Z" fill="#2dd4bf" fill-opacity="0.4"/>
+          <polygon points="41,13 54,4 54,22" fill="#38bdf8" fill-opacity="0.44"/>
+          <circle cx="11" cy="10" r="2" fill="#ffffff" fill-opacity="0.7"/>
+        </g>
+        <path d="M48 152 L 48 180 A 8 8 0 0 1 32 180 L 32 174" fill="none" stroke="#facc15" stroke-opacity="0.48" stroke-width="2.5" stroke-linecap="round"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#fishPattern)"/>
+  </svg>
+</div>
+
+<div id="printArea"><img id="printImg" alt=""></div>
+
+<input type="file" id="upSp1" accept="image/*" class="file-mob" onchange="uploadSponsor(1, this)">
+<input type="file" id="upSp2" accept="image/*" class="file-mob" onchange="uploadSponsor(2, this)">
+
+<div class="hd" id="mainHeader"></div>
+
+<div class="nv">
+  <button id="t1" class="act" onclick="tab(1)">🏆 РАНГ</button>
+  <button id="t2" onclick="tab(2)">✏️ УНОС</button>
+  <button id="t3" onclick="tab(3)">📄 ПДФ/XLS</button>
+  <button id="t4" onclick="tab(4)">⚙️ ЕКИПЕ</button>
+</div>
+
+<div class="bx">
+  <div id="p1"></div>
+
+  <div id="p2" class="hi">
+    <div class="cd"><b>Коло:</b><select id="ks" onchange="inps()"></select></div>
+    <div id="in"></div>
+    <button class="bt" onclick="sav()">💾 САЧУВАЈ И ПРИКАЖИ РАНГ</button>
+  </div>
+
+  <div id="p3" class="hi cd">
+    <button class="bt bt-wa" onclick="makeReport('podium')">🏆 ПОДЕЛИ РАНГ ЛИСТУ (ВАЈБЕР / WA)</button>
+    <button class="bt bt-tbl" onclick="makeReport('table')">📊 ПОДЕЛИ ТАБЕЛУ ПО КОЛИМА (СЛИКА)</button>
+    <button class="bt bt-pdf" onclick="makeReport('pdf')">📄 ПДФ / ШТАМПАЊЕ РАНГ ЛИСТЕ</button>
+    <button class="bt" onclick="downloadExcel()">⬇️ ПОДЕЛИ / САЧУВАЈ EXCEL ТАБЕЛУ</button>
+    <div id="prevBox" class="hi">
+      <p style="font-size:13px; color:#1b4332; font-weight:bold; margin:8px 0;">Слика је спремна (задржи прст на слици испод за чување или дељење):</p>
+      <img id="prevImg" alt="Ранг листа">
+    </div>
+  </div>
+
+  <div id="p4" class="hi">
+    <div class="cd">
+      <div class="sec-title">Назив лиге и логотипи спонзора</div>
+      <div style="display:flex; gap:6px; margin-bottom:8px;">
+        <input type="text" id="leagueNameInp" placeholder="Назив лиге...">
+        <button class="bt-sm bt-ed" style="padding:0 14px;" onclick="saveLeagueTitleInp()">💾 Сачувај</button>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <label for="upSp1" class="bt-sm bt-logo" style="flex:1; padding:10px;">🖼️ Лого 1 (лево)</label>
+        <label for="upSp2" class="bt-sm bt-logo" style="flex:1; padding:10px;">🖼️ Лого 2 (десно)</label>
+      </div>
+      <div id="spClearRow" style="display:flex; gap:8px; margin-top:6px;"></div>
+    </div>
+    <div class="cd">
+      <div class="sec-title">Додај нову екипу</div>
+      <input type="text" id="nt" placeholder="Назив нове екипе...">
+      <button class="bt" onclick="add()">➕ ДОДАЈ ЕКИПУ</button>
+    </div>
+    <div class="cd">
+      <div class="sec-title">Резервна копија (Backup)</div>
+      <div style="display:flex; gap:8px;">
+        <button class="bt-sm" style="flex:1; padding:11px; background:#0f172a;" onclick="exportBackup()">💾 САЧУВАЈ BACKUP</button>
+        <input type="file" id="upBackup" accept=".json,application/json" class="file-mob" onchange="importBackup(this)">
+        <label for="upBackup" class="bt-sm" style="flex:1; padding:11px; background:#0284c7;">📂 УЧИТАЈ BACKUP</label>
+      </div>
+    </div>
+    <div class="cd" id="mg"></div>
+  </div>
+</div>
+<script>
+const raw = [
+  "Skrapez Pozega 1|11,2310|22,1830|10,3235|11.5,3265|13,2095|20,2360|19,2085|10,2125|20,1575|21,2045",
+  "Skrapez Pozega 2|20,1700|13,2770|16,2790|17,2980|20,1140|14,3615|18,2105|26,645|23,1055|16,2165",
+  "Skrapez Kosjeric|16,2150|17,4585|8,4055|16,3640|14,3455|10,4345|6,4205|9,2655|15,1915|15,3270",
+  "Forca Pozega|22,690|15.5,2355|24,1285|21,1475|18,2180|25,1935|20,2095|25,715|15,2040|18,1940",
+  "Bjelica Lucani|16,1810|11,3240|14,2895|13,5265|16,1880|12,3635|16,2805|11,2875|20,1355|12,2765",
+  "Namenska Lucani|12,2815|16,3685|16,2330|21,2250|20,1280|7,4875|20,1530|15,1500|5,3405|13,3790",
+  "Cacak Cacak|20,1080|22,1895|14,2820|9,4055|11,3730|13,3350|11,3030|24,860|10,2660|22,1935",
+  "Sveti Nikola Preljina|17,1360|23,940|12,3800|9.5,3850|7,2960|27,1420|6,5430|7,3250|14,1955|9,3595",
+  "Tim Ribolovac Arilje|15,2005|7,4085|26,1080|20,2105|20,1210|14,3305|24,1280|12,2200|17.5,1775|11,2185",
+  "Zanatlije Arilje|16,1800|18.5,1715|25,1000|27,1565|26,730|23,1875|25,980|26,780|25.5,965|28,790"
+];
+
+function parseDefault() {
+  return raw.map(l => {
+    let p = l.split('|');
+    return {
+      n: p.at(0),
+      logo: "",
+      r: p.slice(1).map(x => {
+        let parts = x.split(',');
+        return { b: +parts.at(0) || 0, g: +parts.at(1) || 0 };
+      })
+    };
+  });
+}
+
+let d = parseDefault();
+let meta = { title: "🎣 ЕКИПНО ТАКМИЧЕЊЕ 2026", sp1: "", sp2: "" };
+let editingTeamIdx = -1;
+
+try {
+  let s = localStorage.getItem('r26_ios');
+  if (s) {
+    let parsed = JSON.parse(s);
+    if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed.at(0).n === 'string' && !parsed.at(0).n.includes('|')) {
+      d = parsed.map(t => ({ n: t.n, logo: t.logo || "", r: t.r }));
+    } else {
+      localStorage.setItem('r26_ios', JSON.stringify(d));
+    }
+  }
+  let m = localStorage.getItem('r26_meta');
+  if (m) meta = Object.assign(meta, JSON.parse(m));
+} catch (e) {}
+
+const st = () => {
+  try {
+    localStorage.setItem('r26_ios', JSON.stringify(d));
+    localStorage.setItem('r26_meta', JSON.stringify(meta));
+  } catch (e) {
+    alert("Меморија прегледача је пуна. Покушајте са мањим сликама.");
+  }
+};
+
+function resizeImage(file, maxSize, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > h && w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; }
+      else if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/png', 0.85));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderHeader() {
+  document.title = meta.title.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim() || "Такмичење 2026";
+  let leftLogo = meta.sp1 ? `<img src="${meta.sp1}" class="hd-logo" alt="Лого 1">` : '';
+  let rightLogo = meta.sp2 ? `<img src="${meta.sp2}" class="hd-logo" alt="Лого 2">` : '';
+  document.getElementById('mainHeader').innerHTML = `${leftLogo}<span class="hd-title">${meta.title}</span>${rightLogo}`;
+  document.getElementById('leagueNameInp').value = meta.title;
+
+  let clrHtml = '';
+  if (meta.sp1) clrHtml += `<button class="bt-sm bt-del" style="flex:1" onclick="clearSponsor(1)">Уклони Лого 1</button>`;
+  if (meta.sp2) clrHtml += `<button class="bt-sm bt-del" style="flex:1" onclick="clearSponsor(2)">Уклони Лого 2</button>`;
+  document.getElementById('spClearRow').innerHTML = clrHtml;
+}
+
+function saveLeagueTitleInp() {
+  const val = document.getElementById('leagueNameInp').value.trim();
+  if (val !== "") {
+    meta.title = val;
+    st();
+    renderHeader();
+  }
+}
+
+function uploadSponsor(num, input) {
+  if (!input.files || input.files.length === 0) return;
+  resizeImage(input.files.item(0), 180, (dataUrl) => {
+    if (num === 1) meta.sp1 = dataUrl; else meta.sp2 = dataUrl;
+    st(); renderHeader(); input.value = '';
+  });
+}
+
+function clearSponsor(num) {
+  if (num === 1) meta.sp1 = ""; else meta.sp2 = "";
+  st(); renderHeader();
+}
+
+function uploadTeamLogoDirect(i, input) {
+  if (!input.files || input.files.length === 0) return;
+  resizeImage(input.files.item(0), 120, (dataUrl) => {
+    d.at(i).logo = dataUrl;
+    st(); all();
+  });
+}
+
+function clearTeamLogo(i) { d.at(i).logo = ""; st(); all(); }
+const ks = document.getElementById('ks');
+for (let i = 1; i <= 10; i++) ks.innerHTML += `<option value="${i-1}">${i}. КОЛО</option>`;
+
+function srt() {
+  return d.map(t => {
+    let b = 0, g = 0;
+    t.r.forEach(x => { b += +x.b || 0; g += +x.g || 0; });
+    return { n: t.n, logo: t.logo, r: t.r, b, g };
+  }).sort((a, b) => a.b !== b.b ? a.b - b.b : b.g - a.g);
+}
+
+function getTrophy3D(place) {
+  const palettes = {
+    1: { c1: '#fef08a', c2: '#f59e0b', c3: '#b45309', base: '#78350f', num: '#78350f' },
+    2: { c1: '#ffffff', c2: '#cbd5e1', c3: '#64748b', base: '#334155', num: '#1e293b' },
+    3: { c1: '#fed7aa', c2: '#ea580c', c3: '#9a3412', base: '#431407', num: '#431407' }
+  };
+  const p = palettes[place];
+  const gid = 'tg' + place;
+  return `<svg class="trophy-3d" viewBox="0 0 64 64" xmlns="http://w3.org">
+    <defs>
+      <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${p.c1}"/>
+        <stop offset="50%" stop-color="${p.c2}"/>
+        <stop offset="100%" stop-color="${p.c3}"/>
+      </linearGradient>
+    </defs>
+    <path d="M16 14 H8 C5 14 4 22 10 27 C13 30 17 31 20 31" fill="none" stroke="url(#${gid})" stroke-width="4" stroke-linecap="round"/>
+    <path d="M48 14 H56 C59 14 60 22 54 27 C51 30 47 31 44 31" fill="none" stroke="url(#${gid})" stroke-width="4" stroke-linecap="round"/>
+    <path d="M16 10 H48 L44 32 C43 39 38 43 32 43 C26 43 21 39 20 32 Z" fill="url(#${gid})" stroke="${p.c3}" stroke-width="1.5"/>
+    <path d="M21 13 H26 L24 31 C22 28 21 22 21 13 Z" fill="#ffffff" fill-opacity="0.45"/>
+    <rect x="29" y="42" width="6" height="9" fill="url(#${gid})"/>
+    <path d="M21 51 H43 L46 58 H18 Z" fill="${p.base}"/>
+    <rect x="22" y="52" width="20" height="3" fill="url(#${gid})"/>
+    <text x="32" y="30" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="16" fill="${p.num}">${place}</text>
+  </svg>`;
+}
+
+function rnk() {
+  const list = srt();
+  let topHtml = '';
+  let restHtml = '';
+
+  list.forEach((t, i) => {
+    let logoHtml = t.logo ? `<img src="${t.logo}" class="t-logo" alt="">` : '';
+    if (i < 3) {
+      topHtml += `<div class="podium-card pod-${i+1}">
+        <div class="t-info">
+          ${getTrophy3D(i + 1)}
+          ${logoHtml}
+          <span class="t-name">${t.n}</span>
+        </div>
+        <div style="text-align:right; flex-shrink:0;">
+          <b style="color:#0f172a; font-size:16px;">${t.b} бод.</b><br>
+          <small style="color:#334155; font-weight:700;">${t.g} г</small>
+        </div>
+      </div>`;
+    } else {
+      restHtml += `<div class="rw">
+        <div class="t-info">
+          <span class="bg">${i+1}</span>
+          ${logoHtml}
+          <span class="t-name">${t.n}</span>
+        </div>
+        <div style="text-align:right; flex-shrink:0;">
+          <b style="color:#0f172a; font-size:15px;">${t.b} бод.</b><br>
+          <small style="color:#64748b; font-weight:600;">${t.g} г</small>
+        </div>
+      </div>`;
+    }
+  });
+
+  document.getElementById('p1').innerHTML = topHtml + (restHtml ? `<div class="cd">${restHtml}</div>` : '');
+}
+
+function inps() {
+  let k = +ks.value;
+  document.getElementById('in').innerHTML = d.map((t, i) => {
+    let x = t.r.at(k) || { b: 0, g: 0 };
+    let logoHtml = t.logo ? `<img src="${t.logo}" class="t-logo" style="width:24px;height:24px;" alt="">` : '';
+    return `<div class="cd"><div style="display:flex;align-items:center;gap:8px;">${logoHtml}<b>${t.n}</b></div>
+      <div class="gr"><div><small>Бодови</small><input type="number" step="0.5" id="b${i}" value="${x.b}"></div>
+      <div><small>Грами</small><input type="number" id="g${i}" value="${x.g}"></div></div></div>`;
+  }).join('');
+}
+
+function mng() {
+  document.getElementById('mg').innerHTML = `<div class="sec-title">Управљање екипама</div>` + d.map((t, i) => {
+    let logoHtml = t.logo ? `<img src="${t.logo}" class="t-logo" alt="">` : '';
+    let delLogoBtn = t.logo ? `<button class="bt-sm" style="background:#64748b;" onclick="clearTeamLogo(${i})">✖</button>` : '';
+    let nameArea = (editingTeamIdx === i)
+      ? `<div style="display:flex; gap:5px; width:100%; margin-top:6px;">
+           <input type="text" id="edInp${i}" value="${t.n}">
+           <button class="bt-sm" style="background:#16a34a; padding:0 12px;" onclick="saveEditTeam(${i})">💾</button>
+           <button class="bt-sm" style="background:#64748b; padding:0 10px;" onclick="cancelEditTeam()">✖</button>
+         </div>`
+      : '';
+    return `<div class="rw">
+      <div class="t-info">${logoHtml}<span style="font-weight:bold; font-size:13.5px;">${t.n}</span></div>
+      <div style="display:flex; gap:4px; flex-shrink:0;">
+        <input type="file" id="tFile${i}" accept="image/*" class="file-mob" onchange="uploadTeamLogoDirect(${i}, this)">
+        <label for="tFile${i}" class="bt-sm bt-logo">🖼️</label>${delLogoBtn}
+        <button class="bt-sm bt-ed" onclick="startEditTeam(${i})">✏️</button>
+        <button class="bt-sm bt-del" onclick="del(${i})">🗑️</button>
+      </div>
+      ${nameArea}
+    </div>`;
+  }).join('');
+}
+
+function startEditTeam(i) { editingTeamIdx = i; mng(); }
+function cancelEditTeam() { editingTeamIdx = -1; mng(); }
+function saveEditTeam(i) {
+  const val = document.getElementById('edInp' + i).value.trim();
+  if (val !== "") { d.at(i).n = val; editingTeamIdx = -1; st(); all(); }
+}
+
+function add() {
+  let v = document.getElementById('nt').value.trim();
+  if (!v) return;
+  d.push({ n: v, logo: "", r: Array.from({ length: 10 }, () => ({ b: 0, g: 0 })) });
+  document.getElementById('nt').value = '';
+  st(); all();
+}
+
+function del(i) {
+  if (confirm('Обрисати екипу?')) { d.splice(i, 1); editingTeamIdx = -1; st(); all(); }
+}
+
+function sav() {
+  let k = +ks.value;
+  d.forEach((t, i) => t.r.splice(k, 1, { b: +document.getElementById('b' + i).value || 0, g: +document.getElementById('g' + i).value || 0 }));
+  st(); rnk(); tab(1);
+}
+
+function tab(n) {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('p' + i).className = i === n ? (i === 3 ? 'cd' : '') : 'hi';
+    document.getElementById('t' + i).className = i === n ? 'act' : '';
+  }
+}
+function loadImgAsync(src) {
+  return new Promise(resolve => {
+    if (!src) return resolve(null);
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+function drawRoundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+async function buildPodiumCanvas() {
+  const list = srt();
+  const W = 820;
+  const topCount = Math.min(3, list.length);
+  const restCount = Math.max(0, list.length - 3);
+  const H = 175 + topCount * 98 + (restCount > 0 ? restCount * 68 + 30 : 0) + 40;
+
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const ctx = c.getContext('2d');
+
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#06283D');
+  grad.addColorStop(0.5, '#0E4D64');
+  grad.addColorStop(1, '#1B4332');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.16)';
+  ctx.lineWidth = 3;
+  for (let wy = 140; wy < H; wy += 190) {
+    ctx.beginPath();
+    ctx.moveTo(0, wy);
+    ctx.quadraticCurveTo(W * 0.25, wy - 25, W * 0.5, wy);
+    ctx.quadraticCurveTo(W * 0.75, wy + 25, W, wy);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+  ctx.fillRect(0, 0, W, 118);
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+  ctx.fillRect(0, 116, W, 3);
+
+  const [imgSp1, imgSp2] = await Promise.all([loadImgAsync(meta.sp1), loadImgAsync(meta.sp2)]);
+  const teamImgs = await Promise.all(list.map(t => loadImgAsync(t.logo)));
+
+  if (imgSp1) {
+    ctx.fillStyle = '#ffffff';
+    drawRoundedRect(ctx, 26, 20, 78, 78, 14);
+    ctx.fill();
+    ctx.drawImage(imgSp1, 30, 24, 70, 70);
+  }
+  if (imgSp2) {
+    ctx.fillStyle = '#ffffff';
+    drawRoundedRect(ctx, W - 104, 20, 78, 78, 14);
+    ctx.fill();
+    ctx.drawImage(imgSp2, W - 100, 24, 70, 70);
+  }
+
+  const cleanTitle = meta.title.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim().toUpperCase();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 28px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(cleanTitle, W / 2, 68);
+  ctx.textAlign = 'left';
+
+  let y = 145;
+
+  for (let i = 0; i < topCount; i++) {
+    const t = list.at(i);
+    const cardGrad = ctx.createLinearGradient(30, y, W - 30, y + 84);
+    if (i === 0) { cardGrad.addColorStop(0, '#fffbeb'); cardGrad.addColorStop(1, '#fde68a'); ctx.strokeStyle = '#f59e0b'; }
+    else if (i === 1) { cardGrad.addColorStop(0, '#f8fafc'); cardGrad.addColorStop(1, '#cbd5e1'); ctx.strokeStyle = '#94a3b8'; }
+    else { cardGrad.addColorStop(0, '#fff7ed'); cardGrad.addColorStop(1, '#fed7aa'); ctx.strokeStyle = '#d97706'; }
+    ctx.fillStyle = cardGrad;
+    ctx.lineWidth = 3;
+    drawRoundedRect(ctx, 30, y, W - 60, 84, 18);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = i === 0 ? '#f59e0b' : (i === 1 ? '#64748b' : '#c2410c');
+    ctx.beginPath();
+    ctx.arc(76, y + 42, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 22px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🏆' + (i + 1), 76, y + 50);
+    ctx.textAlign = 'left';
+
+    let nameX = 118;
+    if (teamImgs.at(i)) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(140, y + 42, 24, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(teamImgs.at(i), 116, y + 18, 48, 48);
+      ctx.restore();
+      nameX = 178;
+    }
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '800 24px sans-serif';
+    ctx.fillText(t.n.substring(0, 24), nameX, y + 50);
+
+    ctx.textAlign = 'right';
+    ctx.font = '900 24px sans-serif';
+    ctx.fillText(t.b + ' бод.', W - 52, y + 39);
+    ctx.fillStyle = '#334155';
+    ctx.font = '700 18px sans-serif';
+    ctx.fillText(t.g + ' г', W - 52, y + 65);
+    ctx.textAlign = 'left';
+
+    y += 98;
+  }
+  if (restCount > 0) {
+    const boxH = restCount * 68 + 16;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.97)';
+    drawRoundedRect(ctx, 30, y, W - 60, boxH, 18);
+    ctx.fill();
+
+    let ry = y + 8;
+    for (let i = 3; i < list.length; i++) {
+      const t = list.at(i);
+      if (i > 3) {
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(50, ry);
+        ctx.lineTo(W - 50, ry);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = '#1e3a8a';
+      ctx.beginPath();
+      ctx.arc(72, ry + 34, 19, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(i + 1, 72, ry + 40);
+      ctx.textAlign = 'left';
+
+      let nameX = 108;
+      if (teamImgs.at(i)) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(128, ry + 34, 21, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(teamImgs.at(i), 107, ry + 13, 42, 42);
+        ctx.restore();
+        nameX = 160;
+      }
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '800 22px sans-serif';
+      ctx.fillText(t.n.substring(0, 25), nameX, ry + 41);
+
+      ctx.textAlign = 'right';
+      ctx.font = '800 22px sans-serif';
+      ctx.fillText(t.b + ' бод.', W - 52, ry + 31);
+      ctx.fillStyle = '#64748b';
+      ctx.font = '600 17px sans-serif';
+      ctx.fillText(t.g + ' г', W - 52, ry + 55);
+      ctx.textAlign = 'left';
+
+      ry += 68;
+    }
+  }
+
+  return c;
+}
+
+async function buildTableCanvas() {
+  const list = srt(), W = 1720, H = Math.max(1190, 270 + list.length * 64);
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = '#1b4332';
+  ctx.fillRect(40, 35, W - 80, 80);
+
+  const [imgSp1, imgSp2] = await Promise.all([loadImgAsync(meta.sp1), loadImgAsync(meta.sp2)]);
+  const teamImgs = await Promise.all(list.map(t => loadImgAsync(t.logo)));
+
+  let titleStartX = 65;
+  if (imgSp1) {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(52, 43, 64, 64);
+    ctx.drawImage(imgSp1, 54, 45, 60, 60);
+    titleStartX = 135;
+  }
+  if (imgSp2) {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(W - 116, 43, 64, 64);
+    ctx.drawImage(imgSp2, W - 114, 45, 60, 60);
+  }
+
+  const cleanTitle = meta.title.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim().toUpperCase();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 30px sans-serif';
+  ctx.fillText(cleanTitle + ' - ЗБИРНА РАНГ ЛИСТА', titleStartX, 85);
+
+  let y = 160;
+  ctx.fillStyle = '#2d6a4f';
+  ctx.fillRect(40, y - 35, W - 80, 50);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.fillText('МЕСТО / ЕКИПА', 55, y - 3);
+  for (let k = 1; k <= 10; k++) {
+    ctx.fillText(k + '. КОЛО', 395 + (k - 1) * 107, y - 3);
+  }
+  ctx.fillText('УК.БОД', 1470, y - 3);
+  ctx.fillText('УК.ГР', 1585, y - 3);
+  y += 55;
+
+  list.forEach((t, i) => {
+    if (i === 0) { ctx.fillStyle = '#fef3c7'; ctx.fillRect(40, y - 36, W - 80, 56); }
+    else if (i === 1) { ctx.fillStyle = '#f1f5f9'; ctx.fillRect(40, y - 36, W - 80, 56); }
+    else if (i === 2) { ctx.fillStyle = '#ffedd5'; ctx.fillRect(40, y - 36, W - 80, 56); }
+    else if (i % 2 === 1) { ctx.fillStyle = '#f8fafc'; ctx.fillRect(40, y - 36, W - 80, 56); }
+
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.beginPath();
+    ctx.moveTo(40, y + 20);
+    ctx.lineTo(W - 40, y + 20);
+    ctx.stroke();
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 19px sans-serif';
+    ctx.fillText((i + 1) + '.', 55, y);
+
+    let nameX = 92;
+    if (teamImgs.at(i)) {
+      ctx.drawImage(teamImgs.at(i), 90, y - 24, 34, 34);
+      nameX = 134;
+    }
+
+    ctx.fillText(t.n.substring(0, 22), nameX, y);
+
+    for (let k = 0; k < 10; k++) {
+      let r = t.r.at(k) || { b: 0, g: 0 };
+      let colX = 395 + k * 107;
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText(r.b + ' /', colX, y);
+      let wB = ctx.measureText(r.b + ' / ').width;
+      ctx.fillStyle = '#475569';
+      ctx.font = '15px sans-serif';
+      ctx.fillText(r.g + 'г', colX + wB, y);
+    }
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.fillText(t.b, 1470, y);
+    ctx.fillText(t.g, 1585, y);
+
+    y += 56;
+  });
+
+  return c;
+}
+
+async function makeReport(type) {
+  const canvas = (type === 'podium') ? await buildPodiumCanvas() : await buildTableCanvas();
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+  document.getElementById('prevBox').className = '';
+  document.getElementById('prevImg').src = dataUrl;
+
+  if (type === 'pdf') {
+    const pImg = document.getElementById('printImg');
+    pImg.src = dataUrl;
+    setTimeout(() => { window.print(); }, 250);
+    return;
+  }
+
+  const fname = type === 'podium' ? 'Rang_Lista_2026.jpg' : 'Tabela_Po_Kolima_2026.jpg';
+  canvas.toBlob(async (blob) => {
+    const file = new File([blob], fname, { type: 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: meta.title });
+        return;
+      } catch (e) {}
+    }
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }, 'image/jpeg', 0.92);
+}
+
+async function downloadExcel() {
+  const ranked = srt();
+  const rankMap = new Map();
+  ranked.forEach((t, idx) => rankMap.set(t.n, { place: idx + 1, b: t.b, g: t.g }));
+
+  const cleanTitle = meta.title.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim().toUpperCase();
+
+  let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://w3.org">
+  <head><meta charset="UTF-8">
+  <style>
+    table { border-collapse: collapse; font-family: Calibri, Arial, sans-serif; font-size: 11pt; }
+    th, td { border: 1px solid #000000; padding: 5px 8px; text-align: center; vertical-align: middle; }
+    .top-hd { background-color: #1b4332; color: #ffffff; font-weight: bold; font-size: 13pt; }
+    .sub-hd { background-color: #e2e8f0; color: #000000; font-weight: bold; font-size: 12pt; }
+    .col-hd { background-color: #2d6a4f; color: #ffffff; font-weight: bold; }
+    .col-sub { background-color: #d8f3dc; color: #000000; font-weight: bold; font-size: 10pt; }
+    .team-col { text-align: left; font-weight: bold; }
+    .tot-col { font-weight: bold; background-color: #f8fafc; }
+    .place-col { font-weight: bold; background-color: #fef3c7; }
+  </style>
+  </head><body><table>`;
+
+  html += `<tr><td colspan="25" class="top-hd">${cleanTitle}</td></tr>`;
+  html += `<tr><td colspan="25" class="sub-hd">ЗБИРНА ТАБЕЛА РЕЗУЛТАТА ПО ЕКИПАМА</td></tr>`;
+
+  html += `<tr><th rowspan="2" class="col-hd">ЕКИПА</th>`;
+  for (let k = 1; k <= 10; k++) {
+    html += `<th colspan="2" class="col-hd">${k}. КОЛО</th>`;
+  }
+  html += `<th rowspan="2" class="col-hd">УК. БОД.</th>`;
+  html += `<th rowspan="2" class="col-hd">УК. ГР.</th>`;
+  html += `<th rowspan="2" class="col-hd">МЕСТО</th>`;
+  html += `<th rowspan="2" class="col-hd">ЕКИПА</th></tr>`;
+
+  html += `<tr>`;
+  for (let k = 1; k <= 10; k++) {
+    html += `<th class="col-sub">БОДОВИ</th><th class="col-sub">ГРАМИ</th>`;
+  }
+  html += `</tr>`;
+
+  d.forEach(t => {
+    let info = rankMap.get(t.n) || { place: '-', b: 0, g: 0 };
+    html += `<tr><td class="team-col">${t.n}</td>`;
+    for (let k = 0; k < 10; k++) {
+      let r = t.r.at(k) || { b: 0, g: 0 };
+      html += `<td>${String(r.b).replace('.', ',')}</td><td>${r.g}</td>`;
+    }
+    html += `<td class="tot-col">${String(info.b).replace('.', ',')}</td>`;
+    html += `<td class="tot-col">${info.g}</td>`;
+    html += `<td class="place-col">${info.place}</td>`;
+    html += `<td class="team-col">${t.n}</td></tr>`;
+  });
+
+  html += `</table></body></html>`;
+
+  const blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+  const file = new File([blob], 'Rang_Lista_2026.xls', { type: 'application/vnd.ms-excel' });
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: meta.title });
+      return;
+    } catch (e) {}
+  }
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Rang_Lista_2026.xls';
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(() => {
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, 500);
+}
+
+async function exportBackup() {
+  const payload = JSON.stringify({ d: d, meta: meta });
+  const blob = new Blob([payload], { type: 'application/json' });
+  const fname = 'Liga_Backup_2026.json';
+  const file = new File([blob], fname, { type: 'application/json' });
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: 'Backup - ' + meta.title });
+      return;
+    } catch (e) {}
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 500);
+}
+
+function importBackup(input) {
+  if (!input.files || input.files.length === 0) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (parsed && Array.isArray(parsed.d) && parsed.d.length > 0) {
+        d = parsed.d.map(t => ({ n: t.n, logo: t.logo || "", r: t.r }));
+        if (parsed.meta) meta = Object.assign(meta, parsed.meta);
+        st();
+        all();
+        tab(1);
+        alert('✅ Резервна копија је успешно учитана!');
+      } else {
+        alert('⚠️ Неисправан Backup фајл.');
+      }
+    } catch (err) {
+      alert('⚠️ Грешка при читању фајла.');
+    }
+    input.value = '';
+  };
+  reader.readAsText(input.files.item(0));
+}
+
+
+function all() {
+  renderHeader();
+  rnk();
+  inps();
+  mng();
+}
+
+all();
+tab(1);
+</script>
+</body>
+</html>
