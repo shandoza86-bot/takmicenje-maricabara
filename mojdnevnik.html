@@ -254,47 +254,41 @@ function cyrToLat(str) {
   return str.split('').map(c => map[c] || c).join('');
 }
 
-function handleWxData(data) {
-  const btn = document.getElementById('btnWx');
-  btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-  btn.disabled = false;
-  if (data && data.current) {
-    const c = data.current;
-    const cond = c.condition ? c.condition.text : '';
-    const temp = Math.round(c.temp_c);
-    const press = Math.round(c.pressure_mb);
-    const wind = Math.round(c.wind_kph);
-    const place = data.location ? data.location.name : '';
-    document.getElementById('inpWx').value = `${cond}, ${temp}°C, ${press} hPa, ветар ${wind} km/h (${place})`;
-  } else {
-    alert('Место није пронађено. Упишите назив града (нпр. Пожега, Ужице).');
-  }
-}
-
-function fetchWeatherApi() {
+async function fetchWeatherApi() {
   const btn = document.getElementById('btnWx');
   const rawLoc = document.getElementById('inpLoc').value.trim();
-  let query = 'Pozega Serbia';
+  let query = 'Pozega,Serbia';
   if (rawLoc) {
     const clean = cyrToLat(rawLoc);
     const parts = clean.split(',').map(s => s.trim()).filter(Boolean);
-    query = (parts.length > 1 ? parts[parts.length - 1] : clean) + ' Serbia';
+    query = (parts.length > 1 ? parts[parts.length - 1] : clean) + ',Serbia';
   }
   btn.textContent = '⏳ Учитавање...';
   btn.disabled = true;
 
-  const oldScript = document.getElementById('wxJsonpScript');
-  if (oldScript) oldScript.remove();
+  try {
+    const url = 'https://weatherapi.com' + WX_KEY + '&q=' + encodeURIComponent(query) + '&lang=sr';
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data && data.current) {
+      const c = data.current;
+      const cond = c.condition ? c.condition.text : '';
+      const temp = Math.round(c.temp_c);
+      const press = Math.round(c.pressure_mb);
+      const wind = Math.round(c.wind_kph);
+      const place = data.location ? data.location.name : '';
+      document.getElementById('inpWx').value = `${cond}, ${temp}°C, ${press} hPa, ветар ${wind} km/h (${place})`;
+    } else if (data && data.error) {
+      alert('Порука сервера: ' + data.error.message);
+    } else {
+      alert('Место није пронађено.');
+    }
+  } catch (e) {
+    alert('Грешка везе: ' + (e && e.message ? e.message : e));
+  }
 
-  const sc = document.createElement('script');
-  sc.id = 'wxJsonpScript';
-  sc.src = `https://weatherapi.com{WX_KEY}&q=${encodeURIComponent(query)}&lang=sr&callback=handleWxData`;
-  sc.onerror = function() {
-    btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-    btn.disabled = false;
-    alert('Није могуће повезивање са сервером. Користите дугмад испод или упишите ручно.');
-  };
-  document.body.appendChild(sc);
+  btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+  btn.disabled = false;
 }
 
 function renderYearSelect() {
