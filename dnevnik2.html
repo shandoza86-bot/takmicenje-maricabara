@@ -329,16 +329,6 @@ function getDurationMinutes(startStr, endStr) {
   if (diff < 0) diff += 24 * 60;
   return diff;
 }
-
-function weatherCodeToSr(code) {
-  if (code === 0) return 'Ведро и сунчано';
-  if (code <= 3) return 'Променљиво облачно';
-  if (code <= 48) return 'Магла / сумаглица';
-  if (code <= 67) return 'Киша';
-  if (code <= 77) return 'Снег';
-  if (code <= 82) return 'Пљускови';
-  return 'Грмљавина / непогода';
-}
 function cyrToLat(str) {
   const map = {
     'а':'a','б':'b','в':'v','г':'g','д':'d','ђ':'dj','е':'e','ж':'z','з':'z','и':'i',
@@ -358,78 +348,45 @@ async function fetchWeatherAuto() {
   btn.textContent = '⏳ Учитавање времена...';
   btn.disabled = true;
 
-  const getWeatherByCoords = async (lat, lon, placeLabel) => {
-    const res = await fetch(`https://open-meteo.com{lat}&longitude=${lon}&current=temperature_2m,surface_pressure,wind_speed_10m,weather_code`);
-    const data = await res.json();
-    if (data && data.current) {
-      const c = data.current;
-      const desc = weatherCodeToSr(c.weather_code);
-      const temp = Math.round(c.temperature_2m);
-      const press = Math.round(c.surface_pressure);
-      const wind = Math.round(c.wind_speed_10m);
-      wxInp.value = `${desc}, ${temp}°C, притисак ${press} hPa, ветар ${wind} km/h` + (placeLabel ? ` (${placeLabel})` : '');
-      return true;
+  let query = 'Pozega,Serbia';
+  if (locTxt) {
+    const clean = cyrToLat(locTxt);
+    if (clean.includes(',')) {
+      query = clean.split(',').at(-1).trim() + ',Serbia';
+    } else {
+      const words = clean.split(/\s+/).filter(w => w.length > 2);
+      query = (words.length > 0 ? words.at(-1) : clean) + ',Serbia';
     }
-    return false;
-  };
-
-  const searchCity = async (query) => {
-    const cleanQ = cyrToLat(query).trim();
-    if (!cleanQ) return null;
-    const res = await fetch(`https://open-meteo.com{encodeURIComponent(cleanQ)}&count=1`);
-    const data = await res.json();
-    return (data && data.results && data.results.length > 0) ? data.results.at(0) : null;
-  };
+  }
 
   try {
-    let found = null;
-    if (locTxt) {
-      found = await searchCity(locTxt);
-      if (!found && locTxt.includes(',')) {
-        const parts = locTxt.split(',').map(s => s.trim()).filter(Boolean);
-        found = await searchCity(parts.at(-1));
-      }
-      if (!found) {
-        const words = locTxt.split(/\s+/).filter(w => w.length > 2);
-        if (words.length > 1) found = await searchCity(words.at(-1));
-      }
-    }
+    const res = await fetch(`https://wttr.in{encodeURIComponent(query)}?format=j1&lang=sr`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const cur = data.current_condition.at(0);
+    const desc = (cur.lang_sr && cur.lang_sr.at(0)) ? cur.lang_sr.at(0).value : cur.weatherDesc.at(0).value;
+    const temp = cur.temp_C;
+    const press = cur.pressure;
+    const wind = cur.windspeedKmph;
+    const area = (data.nearest_area && data.nearest_area.at(0)) ? data.nearest_area.at(0).areaName.at(0).value : query.replace(',Serbia', '');
 
-    if (found) {
-      await getWeatherByCoords(found.latitude, found.longitude, found.name);
-      btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-      btn.disabled = false;
-      return;
-    }
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        try {
-          await getWeatherByCoords(pos.coords.latitude, pos.coords.longitude, 'GPS локација');
-        } catch (e) {
-          await getWeatherByCoords(43.8586, 19.8488, 'Ужице');
-        }
-        btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-        btn.disabled = false;
-      }, async () => {
-        try {
-          await getWeatherByCoords(43.8586, 19.8488, 'Ужице');
-        } catch (e) {
-          alert('Проверите интернет везу.');
-        }
-        btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-        btn.disabled = false;
-      }, { timeout: 4000 });
-    } else {
-      await getWeatherByCoords(43.8586, 19.8488, 'Ужице');
-      btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-      btn.disabled = false;
-    }
+    wxInp.value = `${desc}, ${temp}°C, притисак ${press} hPa, ветар ${wind} km/h (${area})`;
   } catch (err) {
-    alert('Није могуће учитати време. Ако отварате локално на рачунару, поставите фајл на GitHub (https) где прегледач дозвољава везу.');
-    btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-    btn.disabled = false;
+    try {
+      const res2 = await fetch(`https://wttr.in`);
+      if (res2.ok) {
+        const txt = await res2.text();
+        wxInp.value = txt.trim() + ' (Ужице/Пожега)';
+      } else {
+        alert('Тренутно није могуће преузети прогнозу. Упишите ручно.');
+      }
+    } catch (e2) {
+      alert('Проверите интернет везу или упишите време ручно.');
+    }
   }
+
+  btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+  btn.disabled = false;
 }
 function updateLocationSuggestions() {
   const uniqueLocs = [...new Set(db.entries.map(e => e.loc.trim()).filter(Boolean))];
