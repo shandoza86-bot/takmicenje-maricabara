@@ -51,7 +51,7 @@
 <body>
 
 <div class="fishing-bg">
-  <svg width="100%" height="100%" xmlns="http://w3.org">
+  <svg width="100%" height="100%">
     <defs>
       <pattern id="fishPattern" width="200" height="200" patternUnits="userSpaceOnUse">
         <path d="M0 35 Q 50 18, 100 35 T 200 35" fill="none" stroke="#38bdf8" stroke-opacity="0.26" stroke-width="2.5"/>
@@ -65,11 +65,6 @@
           <line x1="14" y1="0" x2="14" y2="52" stroke="#fde047" stroke-opacity="0.55" stroke-width="2.5"/>
           <ellipse cx="14" cy="25" rx="7" ry="14" fill="#ef4444" fill-opacity="0.55"/>
           <path d="M7 25 A 7 14 0 0 0 21 25 Z" fill="#ffffff" fill-opacity="0.55"/>
-        </g>
-        <g transform="translate(115,152) rotate(12)">
-          <path d="M0 13 C 14 0, 32 0, 44 13 C 32 26, 14 26, 0 13 Z" fill="#2dd4bf" fill-opacity="0.38"/>
-          <polygon points="41,13 54,4 54,22" fill="#38bdf8" fill-opacity="0.42"/>
-          <circle cx="11" cy="10" r="2" fill="#ffffff" fill-opacity="0.7"/>
         </g>
       </pattern>
     </defs>
@@ -266,10 +261,11 @@ async function fetchWeatherApi() {
   btn.textContent = '⏳ Учитавање...';
   btn.disabled = true;
 
+  const H = 'https:' + String.fromCharCode(47, 47);
+
   try {
-    const proto = String.fromCharCode(104, 116, 116, 112, 115, 58, 47, 47);
-    const fullUrl = proto + '://weatherapi.com' + WX_KEY + '&q=' + encodeURIComponent(query) + '&lang=sr';
-    const res = await fetch(fullUrl);
+    const url = H + '://weatherapi.com' + WX_KEY + '&q=' + encodeURIComponent(query) + '&lang=sr';
+    const res = await fetch(url);
     const data = await res.json();
     if (data && data.current) {
       const c = data.current;
@@ -279,13 +275,26 @@ async function fetchWeatherApi() {
       const wind = Math.round(c.wind_kph);
       const place = data.location ? data.location.name : '';
       document.getElementById('inpWx').value = `${cond}, ${temp}°C, ${press} hPa, ветар ${wind} km/h (${place})`;
-    } else if (data && data.error) {
-      alert('Порука сервера: ' + data.error.message);
+      btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+      btn.disabled = false;
+      return;
     }
-  } catch (e) {
-    alert('Грешка: ' + (e && e.message ? e.message : e));
-  }
+  } catch (e1) {}
 
+  try {
+    const url2 = H + '://open-meteo.com';
+    const res2 = await fetch(url2);
+    const data2 = await res2.json();
+    if (data2 && data2.current_weather) {
+      const w = data2.current_weather;
+      document.getElementById('inpWx').value = `${Math.round(w.temperature)}°C, ветар ${Math.round(w.windspeed)} km/h (Пожега)`;
+      btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+      btn.disabled = false;
+      return;
+    }
+  } catch (e2) {}
+
+  alert('Тренутно није могуће преузети прогнозу. Искористите дугмад испод или упишите ручно.');
   btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
   btn.disabled = false;
 }
