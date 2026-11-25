@@ -267,8 +267,8 @@ async function fetchWeatherApi() {
   btn.disabled = true;
 
   try {
-    const base = ['https:/', '/://weatherapi.com'].join('');
-    const fullUrl = base + '?key=' + WX_KEY + '&q=' + encodeURIComponent(query) + '&lang=sr';
+    const proto = String.fromCharCode(104, 116, 116, 112, 115, 58, 47, 47);
+    const fullUrl = proto + '://weatherapi.com' + WX_KEY + '&q=' + encodeURIComponent(query) + '&lang=sr';
     const res = await fetch(fullUrl);
     const data = await res.json();
     if (data && data.current) {
