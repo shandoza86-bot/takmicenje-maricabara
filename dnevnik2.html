@@ -375,16 +375,29 @@ async function fetchWeatherAuto() {
   btn.disabled = true;
 
   const loadFromOpenMeteo = async (lat, lon, label) => {
-    const url = `https://open-meteo.com{lat}&longitude=${lon}&current=temperature_2m,surface_pressure,wind_speed_10m,weather_code&timezone=Europe%2FBelgrade`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (!data || !data.current) throw new Error('Нема података');
-    const c = data.current;
-    const desc = weatherCodeSr(c.weather_code);
-    const temp = Math.round(c.temperature_2m);
-    const press = Math.round(c.surface_pressure);
-    const wind = Math.round(c.wind_speed_10m);
-    wxInp.value = `${desc}, ${temp}°C, притисак ${press} hPa, ветар ${wind} km/h (${label})`;
+    try {
+      const url = `https://open-meteo.com{lat}&longitude=${lon}&current_weather=true&hourly=surface_pressure&forecast_days=1`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data && data.current_weather) {
+        const c = data.current_weather;
+        const desc = weatherCodeSr(c.weathercode);
+        const temp = Math.round(c.temperature);
+        const wind = Math.round(c.windspeed);
+        const press = (data.hourly && data.hourly.surface_pressure && data.hourly.surface_pressure.at(0))
+          ? Math.round(data.hourly.surface_pressure.at(0)) : '';
+        wxInp.value = `${desc}, ${temp}°C` + (press ? `, притисак ${press} hPa` : '') + `, ветар ${wind} km/h (${label})`;
+        return;
+      }
+    } catch (e1) {}
+
+    const res2 = await fetch(`https://met.no{lat.toFixed(4)}&lon=${lon.toFixed(4)}`);
+    const data2 = await res2.json();
+    const details = data2.properties.timeseries.at(0).data.instant.details;
+    const temp2 = Math.round(details.air_temperature);
+    const press2 = Math.round(details.air_pressure_at_sea_level);
+    const wind2 = Math.round(details.wind_speed * 3.6);
+    wxInp.value = `${temp2}°C, притисак ${press2} hPa, ветар ${wind2} km/h (${label})`;
   };
 
   try {
