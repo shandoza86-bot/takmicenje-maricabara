@@ -254,7 +254,24 @@ function cyrToLat(str) {
   return str.split('').map(c => map[c] || c).join('');
 }
 
-async function fetchWeatherApi() {
+function handleWxData(data) {
+  const btn = document.getElementById('btnWx');
+  btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+  btn.disabled = false;
+  if (data && data.current) {
+    const c = data.current;
+    const cond = c.condition ? c.condition.text : '';
+    const temp = Math.round(c.temp_c);
+    const press = Math.round(c.pressure_mb);
+    const wind = Math.round(c.wind_kph);
+    const place = data.location ? data.location.name : '';
+    document.getElementById('inpWx').value = `${cond}, ${temp}°C, ${press} hPa, ветар ${wind} km/h (${place})`;
+  } else {
+    alert('Место није пронађено. Упишите назив града (нпр. Пожега, Ужице).');
+  }
+}
+
+function fetchWeatherApi() {
   const btn = document.getElementById('btnWx');
   const rawLoc = document.getElementById('inpLoc').value.trim();
   let query = 'Pozega Serbia';
@@ -265,25 +282,19 @@ async function fetchWeatherApi() {
   }
   btn.textContent = '⏳ Учитавање...';
   btn.disabled = true;
-  try {
-    const res = await fetch(`https://weatherapi.com{WX_KEY}&q=${encodeURIComponent(query)}&lang=sr`);
-    const data = await res.json();
-    if (data && data.current) {
-      const c = data.current;
-      const cond = c.condition ? c.condition.text : '';
-      const temp = Math.round(c.temp_c);
-      const press = Math.round(c.pressure_mb);
-      const wind = Math.round(c.wind_kph);
-      const place = data.location ? data.location.name : '';
-      document.getElementById('inpWx').value = `${cond}, ${temp}°C, ${press} hPa, ветар ${wind} km/h (${place})`;
-    } else {
-      alert('Није пронађено место. Упишите назив града (нпр. Пожега, Ужице).');
-    }
-  } catch (e) {
-    alert('Грешка при учитавању времена. Проверите интернет везу.');
-  }
-  btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-  btn.disabled = false;
+
+  const oldScript = document.getElementById('wxJsonpScript');
+  if (oldScript) oldScript.remove();
+
+  const sc = document.createElement('script');
+  sc.id = 'wxJsonpScript';
+  sc.src = `https://weatherapi.com{WX_KEY}&q=${encodeURIComponent(query)}&lang=sr&callback=handleWxData`;
+  sc.onerror = function() {
+    btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+    btn.disabled = false;
+    alert('Није могуће повезивање са сервером. Користите дугмад испод или упишите ручно.');
+  };
+  document.body.appendChild(sc);
 }
 
 function renderYearSelect() {
@@ -295,7 +306,7 @@ function renderYearSelect() {
 function changeYear(yr) { db.currentYear = yr; saveDb(); resetForm(); renderLogs(); renderStats(); }
 
 function createNewYear() {
-  const nextDefault = String((parseInt(db.years[0], 10) || 2026) + 1);
+  const nextDefault = String((parseInt(db.years, 10) || 2026) + 1);
   const newYr = prompt('Упишите нову годину (нпр. 2027):', nextDefault);
   if (!newYr || !newYr.trim()) return;
   const cleanYr = newYr.trim();
@@ -505,7 +516,7 @@ function renderStats() {
     const mins = getDurationMinutes(e.start, e.end);
     if (mins > 0) { totalMins += mins; durCount++; }
     (e.styles || []).forEach(s => { styleCounts[s] = (styleCounts[s] || 0) + 1; });
-    const mIdx = e.date && e.date.includes('-') ? (parseInt(e.date.split('-')[1], 10) - 1) : -1;
+    const mIdx = e.date && e.date.includes('-') ? (parseInt(e.date.split('-'), 10) - 1) : -1;
     const mKey = (mIdx >= 0 && mIdx < 12) ? mIdx : 99;
     if (!byMonth[mKey]) byMonth[mKey] = [];
     byMonth[mKey].push(e);
