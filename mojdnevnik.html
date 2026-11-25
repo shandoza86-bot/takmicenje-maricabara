@@ -267,8 +267,9 @@ async function fetchWeatherApi() {
   btn.disabled = true;
 
   try {
-    const url = 'https://weatherapi.com' + WX_KEY + '&q=' + encodeURIComponent(query) + '&lang=sr';
-    const res = await fetch(url);
+    const base = ['https:/', '/://weatherapi.com'].join('');
+    const fullUrl = base + '?key=' + WX_KEY + '&q=' + encodeURIComponent(query) + '&lang=sr';
+    const res = await fetch(fullUrl);
     const data = await res.json();
     if (data && data.current) {
       const c = data.current;
@@ -280,11 +281,9 @@ async function fetchWeatherApi() {
       document.getElementById('inpWx').value = `${cond}, ${temp}°C, ${press} hPa, ветар ${wind} km/h (${place})`;
     } else if (data && data.error) {
       alert('Порука сервера: ' + data.error.message);
-    } else {
-      alert('Место није пронађено.');
     }
   } catch (e) {
-    alert('Грешка везе: ' + (e && e.message ? e.message : e));
+    alert('Грешка: ' + (e && e.message ? e.message : e));
   }
 
   btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
