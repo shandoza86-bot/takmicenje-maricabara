@@ -29,6 +29,7 @@
   .style-chk { display: flex; align-items: center; justify-content: center; gap: 6px; background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 9px 4px; border-radius: 9px; font-size: 13px; font-weight: 800; cursor: pointer; }
   .style-chk input { width: 17px; height: 17px; accent-color: #0284c7; margin: 0; }
   .bt { width: 100%; padding: 14px; background: linear-gradient(135deg, #1b4332, #2d6a4f); color: #fff; border: none; border-radius: 11px; font-size: 14px; font-weight: 800; margin-top: 12px; cursor: pointer; }
+  .bt-wx { width: 100%; padding: 10px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: none; border-radius: 9px; font-size: 13px; font-weight: 800; margin-top: 6px; cursor: pointer; }
   .bt-sm { border: none; padding: 7px 10px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 700; color: #fff; display: inline-flex; align-items: center; justify-content: center; }
   .bt-ed { background: #d97706; }
   .bt-del { background: #dc2626; }
@@ -102,15 +103,15 @@
       <input type="text" id="inpLoc" list="locSuggestions" placeholder="нпр. Марића бара Пожега, Западна Морава...">
       <datalist id="locSuggestions"></datalist>
 
-      <label class="lbl">Временски услови:</label>
-      <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px;">
-        <button type="button" class="bt-sm" style="background:#0284c7; padding:6px 8px;" onclick="addWxTag('☀️ Ведро')">☀️ Ведро</button>
-        <button type="button" class="bt-sm" style="background:#0284c7; padding:6px 8px;" onclick="addWxTag('⛅ Облачно')">⛅ Облачно</button>
-        <button type="button" class="bt-sm" style="background:#0284c7; padding:6px 8px;" onclick="addWxTag('🌧️ Киша')">🌧️ Киша</button>
-        <button type="button" class="bt-sm" style="background:#0284c7; padding:6px 8px;" onclick="addWxTag('💨 Ветар')">💨 Ветар</button>
-        <button type="button" class="bt-sm" style="background:#0284c7; padding:6px 8px;" onclick="addWxTag('🌫️ Магла')">🌫️ Магла</button>
+      <button type="button" class="bt-wx" id="btnWx" onclick="fetchWeatherApi()">🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ</button>
+      <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
+        <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('☀️ Ведро')">☀️ Ведро</button>
+        <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('⛅ Облачно')">⛅ Облачно</button>
+        <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('🌧️ Киша')">🌧️ Киша</button>
+        <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('💨 Ветар')">💨 Ветар</button>
+        <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('🌫️ Магла')">🌫️ Магла</button>
       </div>
-      <input type="text" id="inpWx" placeholder="Кликни изнад или упиши (нпр. 18°C, 1015 hPa)...">
+      <input type="text" id="inpWx" placeholder="Временски услови (аутоматски или ручно)..." style="margin-top:6px;">
 
       <div class="gr3">
         <div>
@@ -212,6 +213,7 @@
 
 <script>
 const STORAGE_KEY = 'ribolov_dnevnik_v1';
+const WX_KEY = '453778621d5649a19d6132337262511';
 let db = { years: ['2026'], currentYear: '2026', entries: [] };
 let activeTab = 'reka';
 
@@ -232,17 +234,12 @@ function saveDb() {
 }
 function getTodayStr() {
   const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
 function getNowTimeStr() {
   const now = new Date();
-  const hh = String(now.getHours()).padStart(2, '0');
-  const mm = String(now.getMinutes()).padStart(2, '0');
-  return `${hh}:${mm}`;
+  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 }
 
 function setNowEnd() { document.getElementById('inpEnd').value = getNowTimeStr(); }
@@ -252,19 +249,53 @@ function addWxTag(tag) {
   inp.value = inp.value ? (inp.value + ', ' + tag) : tag;
 }
 
+function cyrToLat(str) {
+  const map = { 'а':'a','б':'b','в':'v','г':'g','д':'d','ђ':'dj','е':'e','ж':'z','з':'z','и':'i','ј':'j','к':'k','л':'l','љ':'lj','м':'m','н':'n','њ':'nj','о':'o','п':'p','р':'r','с':'s','т':'t','ћ':'c','у':'u','ф':'f','х':'h','ц':'c','ч':'c','џ':'dz','ш':'s','А':'A','Б':'B','В':'V','Г':'G','Д':'D','Ђ':'Dj','Е':'E','Ж':'Z','З':'Z','И':'I','Ј':'J','К':'K','Л':'L','Љ':'Lj','М':'M','Н':'N','Њ':'Nj','О':'O','П':'P','Р':'R','С':'S','Т':'T','Ћ':'C','У':'U','Ф':'F','Х':'H','Ц':'C','Ч':'C','Џ':'Dz','Ш':'S' };
+  return str.split('').map(c => map[c] || c).join('');
+}
+
+async function fetchWeatherApi() {
+  const btn = document.getElementById('btnWx');
+  const rawLoc = document.getElementById('inpLoc').value.trim();
+  let query = 'Pozega Serbia';
+  if (rawLoc) {
+    const clean = cyrToLat(rawLoc);
+    const parts = clean.split(',').map(s => s.trim()).filter(Boolean);
+    query = (parts.length > 1 ? parts[parts.length - 1] : clean) + ' Serbia';
+  }
+  btn.textContent = '⏳ Учитавање...';
+  btn.disabled = true;
+  try {
+    const res = await fetch(`https://weatherapi.com{WX_KEY}&q=${encodeURIComponent(query)}&lang=sr`);
+    const data = await res.json();
+    if (data && data.current) {
+      const c = data.current;
+      const cond = c.condition ? c.condition.text : '';
+      const temp = Math.round(c.temp_c);
+      const press = Math.round(c.pressure_mb);
+      const wind = Math.round(c.wind_kph);
+      const place = data.location ? data.location.name : '';
+      document.getElementById('inpWx').value = `${cond}, ${temp}°C, ${press} hPa, ветар ${wind} km/h (${place})`;
+    } else {
+      alert('Није пронађено место. Упишите назив града (нпр. Пожега, Ужице).');
+    }
+  } catch (e) {
+    alert('Грешка при учитавању времена. Проверите интернет везу.');
+  }
+  btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+  btn.disabled = false;
+}
+
 function renderYearSelect() {
   const sel = document.getElementById('yearSel');
   db.years.sort((a, b) => b.localeCompare(a));
   sel.innerHTML = db.years.map(y => `<option value="${y}" ${y === db.currentYear ? 'selected' : ''}>${y}. год.</option>`).join('');
 }
 
-function changeYear(yr) {
-  db.currentYear = yr;
-  saveDb(); resetForm(); renderLogs(); renderStats();
-}
+function changeYear(yr) { db.currentYear = yr; saveDb(); resetForm(); renderLogs(); renderStats(); }
 
 function createNewYear() {
-  const nextDefault = String((parseInt(db.years.at(0), 10) || 2026) + 1);
+  const nextDefault = String((parseInt(db.years[0], 10) || 2026) + 1);
   const newYr = prompt('Упишите нову годину (нпр. 2027):', nextDefault);
   if (!newYr || !newYr.trim()) return;
   const cleanYr = newYr.trim();
@@ -291,7 +322,6 @@ function setTab(t) {
     resetForm(); renderLogs();
   }
 }
-
 function calcDurationText(startStr, endStr) {
   if (!startStr || !endStr) return '';
   const [sh, sm] = startStr.split(':').map(Number);
@@ -332,6 +362,7 @@ function setSelectedStyles(arr) {
   document.getElementById('chkTakm').checked = list.includes('Такмичарац');
   document.getElementById('chkBolo').checked = list.includes('Болоњез');
 }
+
 function resetForm() {
   document.getElementById('editId').value = '';
   document.getElementById('inpLoc').value = '';
@@ -411,7 +442,6 @@ function formatDateSr(isoStr) {
   const [y, m, d] = isoStr.split('-');
   return `${d}.${m}.${y}.`;
 }
-
 function renderLogs() {
   const q = (document.getElementById('searchLogs')?.value || '').trim().toLowerCase();
   const list = db.entries
@@ -450,6 +480,7 @@ function renderLogs() {
     </div>`;
   }).join('');
 }
+
 function updateStatLocations() {
   const sel = document.getElementById('statLocSel');
   const prev = sel.value;
@@ -474,7 +505,7 @@ function renderStats() {
     const mins = getDurationMinutes(e.start, e.end);
     if (mins > 0) { totalMins += mins; durCount++; }
     (e.styles || []).forEach(s => { styleCounts[s] = (styleCounts[s] || 0) + 1; });
-    const mIdx = e.date && e.date.includes('-') ? (parseInt(e.date.split('-').at(1), 10) - 1) : -1;
+    const mIdx = e.date && e.date.includes('-') ? (parseInt(e.date.split('-')[1], 10) - 1) : -1;
     const mKey = (mIdx >= 0 && mIdx < 12) ? mIdx : 99;
     if (!byMonth[mKey]) byMonth[mKey] = [];
     byMonth[mKey].push(e);
