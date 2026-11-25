@@ -100,7 +100,7 @@
       <input type="hidden" id="editId" value="">
 
       <label class="lbl">Локација / Вода:</label>
-      <input type="text" id="inpLoc" list="locSuggestions" placeholder="нпр. Западна Морава, Пожега...">
+      <input type="text" id="inpLoc" list="locSuggestions" placeholder="нпр. Марића бара Пожега, Западна Морава...">
       <datalist id="locSuggestions"></datalist>
 
       <button type="button" class="bt-wx" id="btnWeather" onclick="fetchWeatherAuto()">🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ</button>
@@ -341,52 +341,89 @@ function cyrToLat(str) {
   return str.split('').map(c => map[c] || c).join('');
 }
 
+function weatherCodeSr(code) {
+  if (code === 0) return 'Ведро и сунчано';
+  if (code <= 3) return 'Променљиво облачно';
+  if (code <= 48) return 'Магла / сумаглица';
+  if (code <= 67) return 'Киша';
+  if (code <= 77) return 'Снег';
+  if (code <= 82) return 'Пљускови';
+  return 'Грмљавина / непогода';
+}
+
+const knownSpots = [
+  { keys: ['pozega', 'marica', 'skrapez', 'gugalj', 'godovik'], name: 'Пожега', lat: 43.8458, lon: 20.0369 },
+  { keys: ['uzice', 'djetinja', 'stapari', 'vruci'], name: 'Ужице', lat: 43.8586, lon: 19.8488 },
+  { keys: ['arilje', 'rzav', 'moravica'], name: 'Ариље', lat: 43.7531, lon: 20.0956 },
+  { keys: ['lucani', 'bjelica', 'guca'], name: 'Лучани', lat: 43.8606, lon: 20.1375 },
+  { keys: ['kosjeric'], name: 'Косјерић', lat: 43.9936, lon: 19.9056 },
+  { keys: ['cacak', 'ovcar', 'medjuvrsje', 'preljina', 'morava'], name: 'Чачак / Морава', lat: 43.8914, lon: 20.3497 },
+  { keys: ['zaovine', 'tara', 'perucac', 'drina', 'bajina'], name: 'Заовине / Дрина', lat: 43.8833, lon: 19.4000 },
+  { keys: ['zlatar', 'uvac', 'kokin', 'sjenica', 'nova varos'], name: 'Златар / Увац', lat: 43.5167, lon: 19.8167 },
+  { keys: ['zlatibor', 'ribnica'], name: 'Златибор', lat: 43.7292, lon: 19.7000 },
+  { keys: ['ivanjica'], name: 'Ивањица', lat: 43.5811, lon: 20.2297 },
+  { keys: ['kraljevo', 'ibar'], name: 'Краљево', lat: 43.7258, lon: 20.6894 },
+  { keys: ['beograd', 'sava', 'dunav', 'ada'], name: 'Београд', lat: 44.8176, lon: 20.4633 },
+  { keys: ['novi sad'], name: 'Нови Сад', lat: 45.2671, lon: 19.8335 }
+];
+
 async function fetchWeatherAuto() {
   const btn = document.getElementById('btnWeather');
-  const locTxt = document.getElementById('inpLoc').value.trim();
+  const locTxt = cyrToLat(document.getElementById('inpLoc').value.trim()).toLowerCase();
   const wxInp = document.getElementById('inpWx');
   btn.textContent = '⏳ Учитавање времена...';
   btn.disabled = true;
 
-  let query = 'Pozega,Serbia';
-  if (locTxt) {
-    const clean = cyrToLat(locTxt);
-    if (clean.includes(',')) {
-      query = clean.split(',').at(-1).trim() + ',Serbia';
-    } else {
-      const words = clean.split(/\s+/).filter(w => w.length > 2);
-      query = (words.length > 0 ? words.at(-1) : clean) + ',Serbia';
-    }
-  }
+  const loadFromOpenMeteo = async (lat, lon, label) => {
+    const url = `https://open-meteo.com{lat}&longitude=${lon}&current=temperature_2m,surface_pressure,wind_speed_10m,weather_code&timezone=Europe%2FBelgrade`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data || !data.current) throw new Error('Нема података');
+    const c = data.current;
+    const desc = weatherCodeSr(c.weather_code);
+    const temp = Math.round(c.temperature_2m);
+    const press = Math.round(c.surface_pressure);
+    const wind = Math.round(c.wind_speed_10m);
+    wxInp.value = `${desc}, ${temp}°C, притисак ${press} hPa, ветар ${wind} km/h (${label})`;
+  };
 
   try {
-    const res = await fetch(`https://wttr.in{encodeURIComponent(query)}?format=j1&lang=sr`);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const cur = data.current_condition.at(0);
-    const desc = (cur.lang_sr && cur.lang_sr.at(0)) ? cur.lang_sr.at(0).value : cur.weatherDesc.at(0).value;
-    const temp = cur.temp_C;
-    const press = cur.pressure;
-    const wind = cur.windspeedKmph;
-    const area = (data.nearest_area && data.nearest_area.at(0)) ? data.nearest_area.at(0).areaName.at(0).value : query.replace(',Serbia', '');
-
-    wxInp.value = `${desc}, ${temp}°C, притисак ${press} hPa, ветар ${wind} km/h (${area})`;
-  } catch (err) {
-    try {
-      const res2 = await fetch(`https://wttr.in`);
-      if (res2.ok) {
-        const txt = await res2.text();
-        wxInp.value = txt.trim() + ' (Ужице/Пожега)';
-      } else {
-        alert('Тренутно није могуће преузети прогнозу. Упишите ручно.');
-      }
-    } catch (e2) {
-      alert('Проверите интернет везу или упишите време ручно.');
+    let spot = knownSpots.find(s => s.keys.some(k => locTxt.includes(k)));
+    if (spot) {
+      await loadFromOpenMeteo(spot.lat, spot.lon, spot.name);
+      btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+      btn.disabled = false;
+      return;
     }
-  }
 
-  btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-  btn.disabled = false;
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        try {
+          await loadFromOpenMeteo(pos.coords.latitude, pos.coords.longitude, 'GPS локација');
+        } catch (e) {
+          await loadFromOpenMeteo(43.8458, 20.0369, 'Пожега');
+        }
+        btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+        btn.disabled = false;
+      }, async () => {
+        try {
+          await loadFromOpenMeteo(43.8458, 20.0369, 'Пожега');
+        } catch (e) {
+          alert('Проверите интернет везу.');
+        }
+        btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+        btn.disabled = false;
+      }, { timeout: 5000 });
+    } else {
+      await loadFromOpenMeteo(43.8458, 20.0369, 'Пожега');
+      btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    alert('Није могуће учитати време. Проверите интернет везу.');
+    btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
+    btn.disabled = false;
+  }
 }
 function updateLocationSuggestions() {
   const uniqueLocs = [...new Set(db.entries.map(e => e.loc.trim()).filter(Boolean))];
