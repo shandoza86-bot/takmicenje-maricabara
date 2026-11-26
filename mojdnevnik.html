@@ -7,13 +7,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Дневник Пецања</title>
 <style>
+  :root { --card-alpha: 0.88; }
   html, body { margin: 0; padding: 0; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; }
   body { padding-bottom: 50px; background: transparent; }
   .fishing-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; background: linear-gradient(160deg, #06283D 0%, #0E4D64 48%, #1B4332 100%); background-size: cover; background-position: center; }
+  .bg-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 78%; max-width: 340px; opacity: 0.22; filter: invert(1) brightness(1.8); pointer-events: none; }
   .theme-dot { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.35); cursor: pointer; }
   .hd, .nv, .bx { position: relative; z-index: 1; }
   .hd { background: linear-gradient(90deg, rgba(6, 40, 61, 0.96), rgba(15, 23, 42, 0.96), rgba(27, 67, 50, 0.96)); color: #fff; padding: 11px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 2px solid rgba(56, 189, 248, 0.35); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-  .hd-title { font-weight: 900; font-size: 16px; }
+  .hd-title { font-weight: 900; font-size: 15px; cursor: pointer; text-decoration: underline dotted rgba(255,255,255,0.45); }
   .yr-box { display: flex; align-items: center; gap: 5px; }
   .yr-sel { padding: 6px 8px; font-size: 14px; font-weight: 800; border-radius: 8px; border: 1px solid #38bdf8; background: #0f172a; color: #fff; }
   .yr-btn { padding: 6px 9px; font-size: 12px; font-weight: 800; border-radius: 8px; border: none; background: #0284c7; color: #fff; cursor: pointer; }
@@ -21,59 +23,41 @@
   .nv button { flex: 1; padding: 12px 1px; border: none; background: none; color: #cbd5e1; font-weight: 800; font-size: 10.5px; cursor: pointer; }
   .nv button.act { background: linear-gradient(180deg, rgba(56, 189, 248, 0.25), rgba(16, 185, 129, 0.3)); color: #ffffff; border-bottom: 3px solid #38bdf8; }
   .bx { padding: 14px 12px; max-width: 520px; margin: auto; }
-  .cd { background: rgba(255, 255, 255, 0.97); padding: 14px; border-radius: 15px; margin-bottom: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.28); }
-  .sec-title { font-size: 12px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; }
-  label.lbl { display: block; font-size: 12px; font-weight: 700; color: #334155; margin: 8px 0 4px; }
-  input[type="text"], input[type="date"], input[type="time"], select, textarea { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 9px; box-sizing: border-box; background: #f8fafc; font-family: inherit; }
+  .cd { background: rgba(255, 255, 255, var(--card-alpha)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 14px; border-radius: 15px; margin-bottom: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+  .sec-title { font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; margin-bottom: 8px; }
+  label.lbl { display: block; font-size: 12px; font-weight: 700; color: #1e293b; margin: 8px 0 4px; }
+  input[type="text"], input[type="date"], input[type="time"], select, textarea { width: 100%; padding: 10px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 9px; box-sizing: border-box; background: rgba(248, 250, 252, 0.92); font-family: inherit; color: #0f172a; }
+  .gr2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .gr3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-  .style-chk { display: flex; align-items: center; justify-content: center; gap: 6px; background: #f1f5f9; border: 1.5px solid #cbd5e1; padding: 9px 4px; border-radius: 9px; font-size: 13px; font-weight: 800; cursor: pointer; }
+  .style-chk { display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(241, 245, 249, 0.92); border: 1.5px solid #cbd5e1; padding: 9px 4px; border-radius: 9px; font-size: 13px; font-weight: 800; cursor: pointer; }
   .style-chk input { width: 17px; height: 17px; accent-color: #0284c7; margin: 0; }
   .bt { width: 100%; padding: 14px; background: linear-gradient(135deg, #1b4332, #2d6a4f); color: #fff; border: none; border-radius: 11px; font-size: 14px; font-weight: 800; margin-top: 12px; cursor: pointer; }
-  .bt-wx { width: 100%; padding: 10px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: none; border-radius: 9px; font-size: 13px; font-weight: 800; margin-top: 6px; cursor: pointer; }
   .bt-sm { border: none; padding: 7px 10px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 700; color: #fff; display: inline-flex; align-items: center; justify-content: center; }
   .bt-ed { background: #d97706; }
   .bt-del { background: #dc2626; }
   .hi { display: none !important; }
   .file-mob { position: fixed; top: -100px; left: -100px; width: 1px; height: 1px; opacity: 0.01; }
-  .log-card { background: rgba(255, 255, 255, 0.97); border-radius: 14px; padding: 13px 14px; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.22); border-left: 5px solid #0284c7; }
-  .log-card.comp { border-left-color: #f59e0b; background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%); }
-  .log-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 7px; margin-bottom: 8px; }
+  .log-card { background: rgba(255, 255, 255, var(--card-alpha)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 14px; padding: 13px 14px; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.22); border-left: 5px solid #0284c7; }
+  .log-card.comp { border-left-color: #f59e0b; }
+  .log-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px solid rgba(203, 213, 225, 0.8); padding-bottom: 7px; margin-bottom: 8px; }
   .log-loc { font-weight: 900; font-size: 16px; color: #0f172a; }
-  .log-meta { font-size: 12px; font-weight: 700; color: #64748b; margin-top: 2px; }
+  .log-meta { font-size: 12px; font-weight: 700; color: #475569; margin-top: 2px; }
   .pill { display: inline-block; font-size: 11.5px; font-weight: 800; padding: 3px 8px; border-radius: 7px; margin: 0 4px 6px 0; }
   .pill-wx { background: #e0f2fe; color: #0369a1; }
   .pill-st { background: #dcfce7; color: #166534; }
   .pill-tm { background: #fef3c7; color: #92400e; }
   .log-row { font-size: 13.5px; margin-bottom: 5px; line-height: 1.4; }
-  .month-hd { font-weight: 900; font-size: 14px; color: #0f172a; display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 6px; }
+  .month-hd { font-weight: 900; font-size: 14px; color: #0f172a; display: flex; justify-content: space-between; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 6px; }
 </style>
 </head>
 <body>
 
 <div class="fishing-bg">
-  <svg width="100%" height="100%">
-    <defs>
-      <pattern id="fishPattern" width="200" height="200" patternUnits="userSpaceOnUse">
-        <path d="M0 35 Q 50 18, 100 35 T 200 35" fill="none" stroke="#38bdf8" stroke-opacity="0.26" stroke-width="2.5"/>
-        <path d="M0 140 Q 50 123, 100 140 T 200 140" fill="none" stroke="#34d399" stroke-opacity="0.26" stroke-width="2.5"/>
-        <g transform="translate(22,55) rotate(-20)">
-          <path d="M0 16 C 16 0, 38 0, 52 16 C 38 32, 16 32, 0 16 Z" fill="#f59e0b" fill-opacity="0.4"/>
-          <polygon points="49,16 64,4 64,28" fill="#fb923c" fill-opacity="0.44"/>
-          <circle cx="13" cy="13" r="2.5" fill="#ffffff" fill-opacity="0.75"/>
-        </g>
-        <g transform="translate(145,25) rotate(18)">
-          <line x1="14" y1="0" x2="14" y2="52" stroke="#fde047" stroke-opacity="0.55" stroke-width="2.5"/>
-          <ellipse cx="14" cy="25" rx="7" ry="14" fill="#ef4444" fill-opacity="0.55"/>
-          <path d="M7 25 A 7 14 0 0 0 21 25 Z" fill="#ffffff" fill-opacity="0.55"/>
-        </g>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#fishPattern)"/>
-  </svg>
+  <img src="./skrapez.png" class="bg-logo" id="bgLogoImg" alt="ОСР Скрапеж Пожега">
 </div>
 
 <div class="hd">
-  <span class="hd-title">🎣 ДНЕВНИК ПЕЦАЊА</span>
+  <span class="hd-title" id="appMainTitle" onclick="editAppTitle()" title="Додирни да промениш наслов">🎣 ДНЕВНИК ПЕЦАЊА</span>
   <div class="yr-box">
     <select id="yearSel" class="yr-sel" onchange="changeYear(this.value)"></select>
     <button class="yr-btn" onclick="createNewYear()">➕ Нова год.</button>
@@ -95,18 +79,22 @@
       <input type="hidden" id="editId" value="">
 
       <label class="lbl">Локација / Вода:</label>
-      <input type="text" id="inpLoc" list="locSuggestions" placeholder="нпр. Марића бара Пожега, Западна Морава...">
+      <input type="text" id="inpLoc" list="locSuggestions" placeholder="нпр. Марића бара Пожега, Кнић, Западна Морава...">
       <datalist id="locSuggestions"></datalist>
 
-      <button type="button" class="bt-wx" id="btnWx" onclick="fetchWeatherApi()">🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ</button>
-      <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
+      <label class="lbl">Временски услови:</label>
+      <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px;">
         <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('☀️ Ведро')">☀️ Ведро</button>
         <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('⛅ Облачно')">⛅ Облачно</button>
         <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('🌧️ Киша')">🌧️ Киша</button>
         <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('💨 Ветар')">💨 Ветар</button>
         <button type="button" class="bt-sm" style="background:#0284c7; padding:5px 8px;" onclick="addWxTag('🌫️ Магла')">🌫️ Магла</button>
+        <button type="button" class="bt-sm" style="background:#0f766e; padding:5px 8px;" onclick="addWxTag('10°C')">10°C</button>
+        <button type="button" class="bt-sm" style="background:#0f766e; padding:5px 8px;" onclick="addWxTag('15°C')">15°C</button>
+        <button type="button" class="bt-sm" style="background:#0f766e; padding:5px 8px;" onclick="addWxTag('20°C')">20°C</button>
+        <button type="button" class="bt-sm" style="background:#0f766e; padding:5px 8px;" onclick="addWxTag('25°C')">25°C</button>
       </div>
-      <input type="text" id="inpWx" placeholder="Временски услови (аутоматски или ручно)..." style="margin-top:6px;">
+      <input type="text" id="inpWx" placeholder="Кликни изнад или упиши (нпр. 18°C, 1015 hPa)...">
 
       <div class="gr3">
         <div>
@@ -131,18 +119,42 @@
       </div>
 
       <div id="compExtraBox" class="hi">
-        <label class="lbl" style="color:#b45309;">Сектор, стартни број и пласман (Такмичење):</label>
-        <input type="text" id="inpSector" placeholder="нпр. Сектор Б, место 4 — 1. место (4.250 г)">
+        <div class="gr2">
+          <div>
+            <label class="lbl" style="color:#b45309;">Сектор:</label>
+            <input type="text" id="inpSector" placeholder="нпр. Б">
+          </div>
+          <div>
+            <label class="lbl" style="color:#b45309;">Стартни број:</label>
+            <input type="text" id="inpStartNum" placeholder="нпр. 4">
+          </div>
+          <div>
+            <label class="lbl" style="color:#b45309;">Пласман:</label>
+            <input type="text" id="inpPlace" placeholder="нпр. 1. место">
+          </div>
+          <div>
+            <label class="lbl" style="color:#b45309;">Грамажа (г):</label>
+            <input type="text" id="inpWeight" placeholder="нпр. 4250 г">
+          </div>
+        </div>
       </div>
 
-      <label class="lbl">Примама и мамац:</label>
-      <textarea id="inpBait" rows="2" placeholder="Која примама, земља, арома и мамац су коришћени..."></textarea>
+      <label class="lbl">🥣 Примама:</label>
+      <textarea id="inpBait" rows="2" placeholder="Која примама, земља и арома су коришћени..."></textarea>
 
-      <label class="lbl">Оквирно упецане рибе:</label>
-      <input type="text" id="inpCatch" placeholder="нпр. Скобаљ 5 ком (око 3 кг), клен, бодорка...">
+      <label class="lbl">🪱 Мамац:</label>
+      <input type="text" id="inpHookBait" placeholder="нпр. Црвићи, пинки, глиста, кукуруз, хлеб...">
 
-      <label class="lbl">Опис пецања и напомене:</label>
-      <textarea id="inpDesc" rows="3" placeholder="Водостај, бистрина, дубина, кад је најбоље радила риба..."></textarea>
+      <div id="regularCatchBox">
+        <label class="lbl">🐟 Оквирно упецане рибе:</label>
+        <input type="text" id="inpCatch" placeholder="нпр. Скобаљ 5 ком (око 3 кг), клен, бодорка...">
+      </div>
+
+      <label class="lbl">🎣 Опис пецања:</label>
+      <textarea id="inpDesc" rows="2" placeholder="Водостај, бистрина, дубина, систем, кад је радила риба..."></textarea>
+
+      <label class="lbl">📝 Напомена:</label>
+      <textarea id="inpNote" rows="2" placeholder="Шта променити следећи пут, важна запажања..."></textarea>
 
       <div style="display:flex; gap:8px;">
         <button class="bt" style="flex:1;" onclick="saveEntry()">💾 САЧУВАЈ ИЗЛАЗАК</button>
@@ -151,7 +163,7 @@
     </div>
 
     <div class="cd" style="padding:10px 12px;">
-      <input type="text" id="searchLogs" placeholder="🔍 Претражи сачуване изласке (локација, риба, примама)..." oninput="renderLogs()">
+      <input type="text" id="searchLogs" placeholder="🔍 Претражи сачуване изласке (локација, риба, примама, мамац)..." oninput="renderLogs()">
     </div>
 
     <div id="logsContainer"></div>
@@ -172,14 +184,21 @@
     <div id="statResults"></div>
 
     <div class="cd">
-      <div class="sec-title">🎨 Позадина апликације</div>
-      <div style="display:flex; justify-content:space-around; align-items:center; margin-bottom:10px; background:#f1f5f9; padding:8px; border-radius:10px;">
+      <div class="sec-title">🎨 Позадина и провидност картица</div>
+      <div style="display:flex; justify-content:space-around; align-items:center; margin-bottom:10px; background:rgba(241,245,249,0.9); padding:8px; border-radius:10px;">
         <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#06283D,#1B4332);" onclick="setBgTheme('default')"></button>
         <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#0284c7,#38bdf8);" onclick="setBgTheme('sky')"></button>
         <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#064e3b,#059669);" onclick="setBgTheme('forest')"></button>
         <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#7c2d12,#d97706);" onclick="setBgTheme('sunset')"></button>
         <button type="button" class="theme-dot" style="background:linear-gradient(135deg,#090d16,#1e293b);" onclick="setBgTheme('night')"></button>
       </div>
+
+      <label class="lbl" style="display:flex; justify-content:space-between;">
+        <span>Провидност белих картица:</span>
+        <span id="alphaValTxt" style="color:#0284c7; font-weight:900;">88%</span>
+      </label>
+      <input type="range" id="alphaSlider" min="45" max="100" value="88" style="width:100%; accent-color:#0284c7; margin-bottom:10px;" oninput="setCardAlpha(this.value)">
+
       <div style="display:flex; gap:8px;">
         <input type="file" id="upBgImg" accept="image/*" class="file-mob" onchange="uploadBgPhoto(this)">
         <label for="upBgImg" class="bt-sm" style="flex:1; padding:11px; background:#0284c7; cursor:pointer;">🖼️ ПОСТАВИ СВОЈУ СЛИКУ</label>
@@ -205,11 +224,9 @@
     </div>
   </div>
 </div>
-
 <script>
 const STORAGE_KEY = 'ribolov_dnevnik_v1';
-const WX_KEY = '453778621d5649a19d6132337262511';
-let db = { years: ['2026'], currentYear: '2026', entries: [] };
+let db = { years: ['2026'], currentYear: '2026', yearTitles: {}, entries: [] };
 let activeTab = 'reka';
 
 const tabLabels = { reka: '🏞️ РЕКА', jezero: '🌊 ЈЕЗЕРО', bara: '🌿 БАРА', takmicenje: '🏆 ТАКМИЧЕЊЕ' };
@@ -219,7 +236,10 @@ try {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     const parsed = JSON.parse(saved);
-    if (parsed && Array.isArray(parsed.entries)) db = Object.assign(db, parsed);
+    if (parsed && Array.isArray(parsed.entries)) {
+      db = Object.assign({ years: ['2026'], currentYear: '2026', yearTitles: {}, entries: [] }, parsed);
+      if (!db.yearTitles) db.yearTitles = {};
+    }
   }
 } catch (e) {}
 
@@ -227,6 +247,7 @@ function saveDb() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
   catch (e) { alert('Меморија прегледача је пуна!'); }
 }
+
 function getTodayStr() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -244,80 +265,42 @@ function addWxTag(tag) {
   inp.value = inp.value ? (inp.value + ', ' + tag) : tag;
 }
 
-function cyrToLat(str) {
-  const map = { 'а':'a','б':'b','в':'v','г':'g','д':'d','ђ':'dj','е':'e','ж':'z','з':'z','и':'i','ј':'j','к':'k','л':'l','љ':'lj','м':'m','н':'n','њ':'nj','о':'o','п':'p','р':'r','с':'s','т':'t','ћ':'c','у':'u','ф':'f','х':'h','ц':'c','ч':'c','џ':'dz','ш':'s','А':'A','Б':'B','В':'V','Г':'G','Д':'D','Ђ':'Dj','Е':'E','Ж':'Z','З':'Z','И':'I','Ј':'J','К':'K','Л':'L','Љ':'Lj','М':'M','Н':'N','Њ':'Nj','О':'O','П':'P','Р':'R','С':'S','Т':'T','Ћ':'C','У':'U','Ф':'F','Х':'H','Ц':'C','Ч':'C','Џ':'Dz','Ш':'S' };
-  return str.split('').map(c => map[c] || c).join('');
+function renderAppTitle() {
+  const custom = db.yearTitles && db.yearTitles[db.currentYear];
+  document.getElementById('appMainTitle').textContent = custom || '🎣 ДНЕВНИК ПЕЦАЊА';
 }
 
-async function fetchWeatherApi() {
-  const btn = document.getElementById('btnWx');
-  const rawLoc = document.getElementById('inpLoc').value.trim();
-  let query = 'Pozega,Serbia';
-  if (rawLoc) {
-    const clean = cyrToLat(rawLoc);
-    const parts = clean.split(',').map(s => s.trim()).filter(Boolean);
-    query = (parts.length > 1 ? parts[parts.length - 1] : clean) + ',Serbia';
+function editAppTitle() {
+  const cur = (db.yearTitles && db.yearTitles[db.currentYear]) || '🎣 ДНЕВНИК ПЕЦАЊА';
+  const next = prompt(`Упишите наслов за ${db.currentYear}. годину:`, cur);
+  if (next !== null) {
+    if (!db.yearTitles) db.yearTitles = {};
+    db.yearTitles[db.currentYear] = next.trim() || '🎣 ДНЕВНИК ПЕЦАЊА';
+    saveDb(); renderAppTitle();
   }
-  btn.textContent = '⏳ Учитавање...';
-  btn.disabled = true;
-
-  const H = 'https:' + String.fromCharCode(47, 47);
-
-  try {
-    const url = H + '://weatherapi.com' + WX_KEY + '&q=' + encodeURIComponent(query) + '&lang=sr';
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data && data.current) {
-      const c = data.current;
-      const cond = c.condition ? c.condition.text : '';
-      const temp = Math.round(c.temp_c);
-      const press = Math.round(c.pressure_mb);
-      const wind = Math.round(c.wind_kph);
-      const place = data.location ? data.location.name : '';
-      document.getElementById('inpWx').value = `${cond}, ${temp}°C, ${press} hPa, ветар ${wind} km/h (${place})`;
-      btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-      btn.disabled = false;
-      return;
-    }
-  } catch (e1) {}
-
-  try {
-    const url2 = H + '://open-meteo.com';
-    const res2 = await fetch(url2);
-    const data2 = await res2.json();
-    if (data2 && data2.current_weather) {
-      const w = data2.current_weather;
-      document.getElementById('inpWx').value = `${Math.round(w.temperature)}°C, ветар ${Math.round(w.windspeed)} km/h (Пожега)`;
-      btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-      btn.disabled = false;
-      return;
-    }
-  } catch (e2) {}
-
-  alert('Тренутно није могуће преузети прогнозу. Искористите дугмад испод или упишите ручно.');
-  btn.textContent = '🌤️ УЧИТАЈ ВРЕМЕ ЗА ОВУ ЛОКАЦИЈУ';
-  btn.disabled = false;
 }
 
 function renderYearSelect() {
   const sel = document.getElementById('yearSel');
   db.years.sort((a, b) => b.localeCompare(a));
   sel.innerHTML = db.years.map(y => `<option value="${y}" ${y === db.currentYear ? 'selected' : ''}>${y}. год.</option>`).join('');
+  renderAppTitle();
 }
 
-function changeYear(yr) { db.currentYear = yr; saveDb(); resetForm(); renderLogs(); renderStats(); }
+function changeYear(yr) { db.currentYear = yr; saveDb(); renderAppTitle(); resetForm(); renderLogs(); renderStats(); }
 
 function createNewYear() {
   const nextDefault = String((parseInt(db.years, 10) || 2026) + 1);
   const newYr = prompt('Упишите нову годину (нпр. 2027):', nextDefault);
   if (!newYr || !newYr.trim()) return;
   const cleanYr = newYr.trim();
+  const customTitle = prompt(`Упишите наслов у горњем левом углу за ${cleanYr}. годину (или оставите празно за подразумевани):`, '🎣 ДНЕВНИК ПЕЦАЊА');
   if (!db.years.includes(cleanYr)) db.years.push(cleanYr);
+  if (!db.yearTitles) db.yearTitles = {};
+  if (customTitle && customTitle.trim()) db.yearTitles[cleanYr] = customTitle.trim();
   db.currentYear = cleanYr;
   saveDb(); renderYearSelect(); resetForm(); renderLogs(); renderStats();
-  alert(`✅ Отворена је ${cleanYr}. година!`);
 }
-
 function setTab(t) {
   activeTab = t;
   ['reka', 'jezero', 'bara', 'takmicenje', 'stat'].forEach(id => {
@@ -331,10 +314,13 @@ function setTab(t) {
     document.getElementById('statSection').classList.add('hi');
     document.getElementById('entrySection').classList.remove('hi');
     document.getElementById('formHeaderTitle').textContent = 'Нови излазак — ' + tabLabels[t];
-    document.getElementById('compExtraBox').classList.toggle('hi', t !== 'takmicenje');
+    const isComp = (t === 'takmicenje');
+    document.getElementById('compExtraBox').classList.toggle('hi', !isComp);
+    document.getElementById('regularCatchBox').classList.toggle('hi', isComp);
     resetForm(); renderLogs();
   }
 }
+
 function calcDurationText(startStr, endStr) {
   if (!startStr || !endStr) return '';
   const [sh, sm] = startStr.split(':').map(Number);
@@ -385,18 +371,23 @@ function resetForm() {
   document.getElementById('inpEnd').value = '';
   setSelectedStyles([]);
   document.getElementById('inpSector').value = '';
+  document.getElementById('inpStartNum').value = '';
+  document.getElementById('inpPlace').value = '';
+  document.getElementById('inpWeight').value = '';
   document.getElementById('inpBait').value = '';
+  document.getElementById('inpHookBait').value = '';
   document.getElementById('inpCatch').value = '';
   document.getElementById('inpDesc').value = '';
+  document.getElementById('inpNote').value = '';
   document.getElementById('btnCancelEdit').classList.add('hi');
   if (activeTab !== 'stat') document.getElementById('formHeaderTitle').textContent = 'Нови излазак — ' + tabLabels[activeTab];
 }
-
 function saveEntry() {
   const loc = document.getElementById('inpLoc').value.trim();
   const dateVal = document.getElementById('inpDate').value || getTodayStr();
   if (!loc) { alert('Упишите локацију / воду!'); return; }
 
+  const isComp = (activeTab === 'takmicenje');
   const editId = document.getElementById('editId').value;
   const entryObj = {
     id: editId || String(Date.now()),
@@ -408,10 +399,15 @@ function saveEntry() {
     start: document.getElementById('inpStart').value,
     end: document.getElementById('inpEnd').value,
     styles: getSelectedStyles(),
-    sector: activeTab === 'takmicenje' ? document.getElementById('inpSector').value.trim() : '',
+    sector: isComp ? document.getElementById('inpSector').value.trim() : '',
+    startNum: isComp ? document.getElementById('inpStartNum').value.trim() : '',
+    place: isComp ? document.getElementById('inpPlace').value.trim() : '',
+    weight: isComp ? document.getElementById('inpWeight').value.trim() : '',
     bait: document.getElementById('inpBait').value.trim(),
-    fish: document.getElementById('inpCatch').value.trim(),
-    desc: document.getElementById('inpDesc').value.trim()
+    hookBait: document.getElementById('inpHookBait').value.trim(),
+    fish: isComp ? '' : document.getElementById('inpCatch').value.trim(),
+    desc: document.getElementById('inpDesc').value.trim(),
+    note: document.getElementById('inpNote').value.trim()
   };
 
   if (editId) {
@@ -435,9 +431,14 @@ function editEntry(id) {
   document.getElementById('inpEnd').value = item.end || '';
   setSelectedStyles(item.styles || []);
   document.getElementById('inpSector').value = item.sector || '';
+  document.getElementById('inpStartNum').value = item.startNum || '';
+  document.getElementById('inpPlace').value = item.place || '';
+  document.getElementById('inpWeight').value = item.weight || '';
   document.getElementById('inpBait').value = item.bait || '';
+  document.getElementById('inpHookBait').value = item.hookBait || '';
   document.getElementById('inpCatch').value = item.fish || '';
   document.getElementById('inpDesc').value = item.desc || '';
+  document.getElementById('inpNote').value = item.note || '';
   document.getElementById('btnCancelEdit').classList.remove('hi');
   document.getElementById('formHeaderTitle').textContent = '✏️ Измена изласка — ' + tabLabels[activeTab];
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -455,16 +456,26 @@ function formatDateSr(isoStr) {
   const [y, m, d] = isoStr.split('-');
   return `${d}.${m}.${y}.`;
 }
+
+function formatCompSummary(e) {
+  const parts = [];
+  if (e.sector) parts.push('Сектор: ' + e.sector);
+  if (e.startNum) parts.push('Број: ' + e.startNum);
+  if (e.place) parts.push('Пласман: ' + e.place);
+  if (e.weight) parts.push('Грамажа: ' + e.weight);
+  return parts.join(' | ');
+}
+
 function renderLogs() {
   const q = (document.getElementById('searchLogs')?.value || '').trim().toLowerCase();
   const list = db.entries
     .filter(e => e.year === db.currentYear && e.type === activeTab)
-    .filter(e => !q || [e.loc, e.bait, e.fish, e.desc, e.sector, (e.styles || []).join(' ')].join(' ').toLowerCase().includes(q))
+    .filter(e => !q || [e.loc, e.bait, e.hookBait, e.fish, e.desc, e.note, e.sector, e.startNum, e.place, e.weight, (e.styles || []).join(' ')].join(' ').toLowerCase().includes(q))
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
   const box = document.getElementById('logsContainer');
   if (list.length === 0) {
-    box.innerHTML = `<div class="cd" style="text-align:center; color:#64748b; font-weight:700;">Нема сачуваних излазака за ${tabLabels[activeTab]} у ${db.currentYear}. години.</div>`;
+    box.innerHTML = `<div class="cd" style="text-align:center; color:#475569; font-weight:700;">Нема сачуваних излазака за ${tabLabels[activeTab]} у ${db.currentYear}. години.</div>`;
     return;
   }
 
@@ -473,6 +484,7 @@ function renderLogs() {
     const timeBadge = (e.start || e.end) ? `<span class="pill pill-tm">⏱️ ${e.start || '?'} - ${e.end || '?'}${dur ? ' (' + dur + ')' : ''}</span>` : '';
     const wxBadge = e.wx ? `<span class="pill pill-wx">🌤️ ${e.wx}</span>` : '';
     const stylesBadge = (e.styles && e.styles.length > 0) ? `<span class="pill pill-st">🎣 ${e.styles.join(', ')}</span>` : '';
+    const compTxt = formatCompSummary(e);
 
     return `<div class="log-card ${e.type === 'takmicenje' ? 'comp' : ''}">
       <div class="log-hd">
@@ -486,14 +498,15 @@ function renderLogs() {
         </div>
       </div>
       <div>${timeBadge}${stylesBadge}${wxBadge}</div>
-      ${e.sector ? `<div class="log-row"><b style="color:#b45309;">🏆 Пласман / Сектор:</b> ${e.sector}</div>` : ''}
-      ${e.bait ? `<div class="log-row"><b>🥣 Примама и мамац:</b> ${e.bait}</div>` : ''}
+      ${compTxt ? `<div class="log-row"><b style="color:#b45309;">🏆 Такмичење:</b> ${compTxt}</div>` : ''}
+      ${e.bait ? `<div class="log-row"><b>🥣 Примама:</b> ${e.bait}</div>` : ''}
+      ${e.hookBait ? `<div class="log-row"><b>🪱 Мамац:</b> ${e.hookBait}</div>` : ''}
       ${e.fish ? `<div class="log-row"><b>🐟 Улов:</b> ${e.fish}</div>` : ''}
-      ${e.desc ? `<div class="log-row"><b>📝 Опис:</b> ${e.desc}</div>` : ''}
+      ${e.desc ? `<div class="log-row"><b>🎣 Опис пецања:</b> ${e.desc}</div>` : ''}
+      ${e.note ? `<div class="log-row"><b>📝 Напомена:</b> ${e.note}</div>` : ''}
     </div>`;
   }).join('');
 }
-
 function updateStatLocations() {
   const sel = document.getElementById('statLocSel');
   const prev = sel.value;
@@ -507,10 +520,10 @@ function renderStats() {
   const loc = document.getElementById('statLocSel').value;
   const scope = document.getElementById('statScopeSel').value;
   const box = document.getElementById('statResults');
-  if (!loc) { box.innerHTML = `<div class="cd" style="text-align:center; color:#64748b; font-weight:700;">Унесите бар један излазак да би се приказала статистика.</div>`; return; }
+  if (!loc) { box.innerHTML = `<div class="cd" style="text-align:center; color:#475569; font-weight:700;">Унесите бар један излазак да би се приказала статистика.</div>`; return; }
 
   const matching = db.entries.filter(e => e.loc.trim().toLowerCase() === loc.trim().toLowerCase() && (scope === 'ALL' || e.year === db.currentYear));
-  if (matching.length === 0) { box.innerHTML = `<div class="cd" style="text-align:center; color:#64748b; font-weight:700;">Нема излазака на локацију „${loc}“.</div>`; return; }
+  if (matching.length === 0) { box.innerHTML = `<div class="cd" style="text-align:center; color:#475569; font-weight:700;">Нема излазака на локацију „${loc}“.</div>`; return; }
 
   let totalMins = 0, durCount = 0;
   const styleCounts = {}, byMonth = {};
@@ -518,7 +531,8 @@ function renderStats() {
     const mins = getDurationMinutes(e.start, e.end);
     if (mins > 0) { totalMins += mins; durCount++; }
     (e.styles || []).forEach(s => { styleCounts[s] = (styleCounts[s] || 0) + 1; });
-    const mIdx = e.date && e.date.includes('-') ? (parseInt(e.date.split('-'), 10) - 1) : -1;
+    const parts = (e.date && e.date.includes('-')) ? e.date.split('-') : [];
+    const mIdx = parts.length >= 2 ? (parseInt(parts, 10) - 1) : -1;
     const mKey = (mIdx >= 0 && mIdx < 12) ? mIdx : 99;
     if (!byMonth[mKey]) byMonth[mKey] = [];
     byMonth[mKey].push(e);
@@ -538,11 +552,16 @@ function renderStats() {
   Object.keys(byMonth).map(Number).sort((a, b) => a - b).forEach(mKey => {
     const items = byMonth[mKey];
     const mName = mKey < 12 ? monthNames[mKey] : 'Без датума';
+    const datesList = items.map(x => formatDateSr(x.date)).filter(Boolean).join(', ') || '-';
+    const hookBaitsList = [...new Set(items.map(x => x.hookBait).filter(Boolean))].join(' | ');
+    const catchesList = [...new Set(items.map(x => x.fish || (x.weight ? ('Грамажа: ' + x.weight) : '')).filter(Boolean))].join(' | ') || '-';
     html += `<div class="cd">
       <div class="month-hd"><span>📅 ${mName}</span><span style="color:#0284c7;">${items.length} излазак(а)</span></div>
+      <div class="log-row"><b>📆 Датуми излазака:</b> ${datesList}</div>
       <div class="log-row"><b>🥢 Стилови:</b> ${[...new Set(items.flatMap(x => x.styles || []))].join(', ') || '-'}</div>
       <div class="log-row"><b>🥣 Примаме:</b> ${[...new Set(items.map(x => x.bait).filter(Boolean))].join(' | ') || '-'}</div>
-      <div class="log-row"><b>🐟 Улови:</b> ${[...new Set(items.map(x => x.fish).filter(Boolean))].join(' | ') || '-'}</div>
+      ${hookBaitsList ? `<div class="log-row"><b>🪱 Мамци:</b> ${hookBaitsList}</div>` : ''}
+      <div class="log-row"><b>🐟 Улови / Грамажа:</b> ${catchesList}</div>
     </div>`;
   });
   box.innerHTML = html;
@@ -556,17 +575,28 @@ const bgThemes = {
   night: 'linear-gradient(160deg, #090d16 0%, #1e293b 50%, #0f172a 100%)'
 };
 
+function setCardAlpha(val) {
+  const num = Math.max(45, Math.min(100, Number(val) || 88));
+  document.documentElement.style.setProperty('--card-alpha', (num / 100).toFixed(2));
+  const sl = document.getElementById('alphaSlider');
+  const tx = document.getElementById('alphaValTxt');
+  if (sl) sl.value = num;
+  if (tx) tx.textContent = num + '%';
+  localStorage.setItem('ribolov_card_alpha', String(num));
+}
+
 function applySavedBg() {
   const bgDiv = document.querySelector('.fishing-bg');
-  const svgEl = bgDiv.querySelector('svg');
+  const logoImg = document.getElementById('bgLogoImg');
   const customImg = localStorage.getItem('ribolov_bg_img');
   const themeKey = localStorage.getItem('ribolov_bg_theme') || 'default';
+  setCardAlpha(localStorage.getItem('ribolov_card_alpha') || 88);
   if (customImg) {
     bgDiv.style.backgroundImage = `linear-gradient(rgba(6, 20, 35, 0.35), rgba(6, 20, 35, 0.45)), url('${customImg}')`;
-    if (svgEl) svgEl.style.display = 'none';
+    if (logoImg) logoImg.style.display = 'none';
   } else {
     bgDiv.style.backgroundImage = bgThemes[themeKey] || bgThemes.default;
-    if (svgEl) svgEl.style.display = 'block';
+    if (logoImg) logoImg.style.display = 'block';
   }
 }
 
@@ -615,7 +645,7 @@ function copyBackupText() {
 }
 function applyBackupData(parsed) {
   if (parsed && Array.isArray(parsed.entries)) {
-    db = Object.assign({ years: ['2026'], currentYear: '2026', entries: [] }, parsed);
+    db = Object.assign({ years: ['2026'], currentYear: '2026', yearTitles: {}, entries: [] }, parsed);
     saveDb(); renderYearSelect(); updateLocationSuggestions(); updateStatLocations(); renderStats();
     alert('✅ Дневник је успешно учитан!');
   } else { alert('⚠️ Неисправан Backup фајл.'); }
